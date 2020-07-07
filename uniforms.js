@@ -84,7 +84,7 @@ let leaves = PIXI.Texture.from('leaves.jpg');
 const uniforms = {
     uSampler2: leaves,
     time: 0,
-    circle_size: 100,
+    circle_size: 65,
 };
 
 const shader = PIXI.Shader.from(vertexSrc, fragmentSrc, uniforms);

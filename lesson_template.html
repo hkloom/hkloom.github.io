@@ -7,16 +7,19 @@
   <link rel="stylesheet" href="styles.css">
   <script src="pixi.min.js"></script>
 <body>
+  <div id="title">
+    Lesson 1
+  </div>
   <div id="instructions">
-    Move the slider to change the size of the circle. <br>
-    Another line of text, just to see. <br>
-    It could be weird.
+    A single pixel <br>
+    With sliding spectrums of light <br>
+    The circle appears
   </div>
   <div id="animation">
     <script src="uniforms.js"></script>
   </div>
   <div class="slidercontainer">
-    <input type="range" min="1" max="100" value="100" class="slider" id="sliderInput" oninput="handleSlider(this.value)">
+    <input type="range" min="30" max="100" value="65" class="slider" id="sliderInput" oninput="handleSlider(this.value)">
   </div>
 </body>
 </html>
