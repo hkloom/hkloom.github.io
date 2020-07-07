@@ -57,4 +57,10 @@
       width: fit-content;
       margin: auto;
       margin-top: 8%;
+      font-family: 'Architect',sans-serif;
+  }
+
+  @font-face {
+    font-family: "Architect";
+    src: url("ArchitectsDaughter-Regular.ttf");
   }
