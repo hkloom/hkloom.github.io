@@ -1,14 +1,16 @@
-var width = 600;
-var height = 600;
+var w = 600;
+var h = 600;
 
-const app = new PIXI.Application(  {width: 600,
-                                    height: 600,
+const app = new PIXI.Application(  {width: w,
+                                    height: h,
                                     backgroundColor: '0x86D0F2',
                                     transparent: true,
-                                    antialias: true
+                                    antialias: true,
+                                    autoResize: true,
+                                    resolution: devicePixelRatio
                                 });
 
-document.getElementById("animation").appendChild(app.view);
+document.body.appendChild(app.view);
 
 // create the root of the scene graph
 var stage = new PIXI.Container();
@@ -91,7 +93,7 @@ const shader = PIXI.Shader.from(vertexSrc, fragmentSrc, uniforms);
 
 const quad = new PIXI.Mesh(geometry, shader);
 
-quad.position.set(width/2, height/2);
+quad.position.set(w/2, h/2);
 quad.scale.set(4);
 
 app.stage.addChild(quad);
@@ -109,3 +111,32 @@ function handleSlider (value)
 {
     quad.shader.uniforms.circle_size = value;
 }
+
+
+// Listen for window resize events
+window.addEventListener('resize', resize);
+
+// Resize function window
+function resize() {
+	// Resize the renderer
+    app.renderer.resize(window.innerWidth, window.innerHeight);
+    
+  
+  // You can use the 'screen' property as the renderer visible
+  // area, this is more useful than view.width/height because
+  // it handles resolution
+  quad.position.set(app.screen.width/2, app.screen.height/2);
+
+  var ratio = app.screen.width / app.screen.height;
+
+  var short_side = app.screen.width;
+
+  if (ratio > 1){
+    short_side = app.screen.height;
+  }
+
+  quad.scale.set(short_side/200);
+
+}
+
+resize();
