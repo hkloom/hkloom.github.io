@@ -140,3 +140,7 @@ function resize() {
 }
 
 resize();
+
+screen.orientation.addEventListener("change", function(e) {
+    location.reload();
+  }, false);
