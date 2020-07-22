@@ -2,6 +2,10 @@
   box-sizing: border-box;
 }
 
+.equation {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+}
+
 .row::after {
   content: "";
   clear: both;
@@ -83,7 +87,6 @@ canvas {
   }
 
   #instructions {
-      width: fit-content;
       padding: 1em;
       padding-top: 0.3em;
       margin: auto;

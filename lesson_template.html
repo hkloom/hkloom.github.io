@@ -10,15 +10,22 @@
 <body>
   <script src="uniforms.js"></script>
   <div id="title">
-    Lesson 1
+    Line
   </div>
     <div id="instructions" class="col-4">
-      A single pixel <br>
-      With sliding spectrums of light <br>
-      The circle appears
+    <div type="text" id="equation" value="y = 0*x" class="equation">
+      y<sub>1</sub> = 0x + 0
     </div>
-  <div class="slidercontainer col-12">
-    <input type="range" min="30" max="100" value="65" class="slider" id="sliderInput" oninput="handleSlider(this.value)">
+    <br>
+      <div type="text" id="" value="y = 0*x" class="equation">
+        m<sub>1</sub>: 
+    <input type="range" min="-5" max="5" value="0" step="0.5" class="slider" id="sliderInput" oninput="handleSlider(this.value)">
+      
+  </div>
+  <div type="text" id="" value="y = 0*x" class="equation">
+    b<sub>1</sub>: 
+    <input type="range" min="-5" max="5" value="0" step="0.5" class="slider" id="b1" oninput="handleB1(this.value)">
+    </div>
   </div>
 </body>
 </html>

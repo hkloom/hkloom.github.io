@@ -7,7 +7,8 @@ const app = new PIXI.Application(  {width: w,
                                     transparent: true,
                                     antialias: true,
                                     autoResize: true,
-                                    resolution: devicePixelRatio
+                                    resolution: devicePixelRatio,
+                                    resizeTo: window
                                 });
 
 document.body.appendChild(app.view);
@@ -93,32 +94,51 @@ const fragmentSrc = `
 
     uniform sampler2D uSampler2;
     uniform float time;
-    uniform float circle_size;
+    uniform float m1;
+    uniform float b1;
 
     void main() {
 
-        float dx = vUvs.x - 0.5;
-        float dy = vUvs.y - 0.5;
-
-        float x = mod(vUvs.x * 1.0,1.0);
-        float y = 1.0 - mod(vUvs.y * 1.0,1.0);
+        float x = vUvs.x - 0.5;
+        float y = vUvs.y - 0.5;
 
         vec4 color = vec4(1,1,1,0);
 
-        if (abs(y * circle_size * 20.0 / 360.0 - x) < 0.01){
-            color = vec4(1,0,0,1);
+
+        // y = x
+        float f = y - ( x );
+
+        //distance point to line:
+        // line: ax + by + c = 0, point: x0, y0
+        // y = -a/b*x - c/b
+        // let b = 1, c = 0
+        // distance = abs(ax0 + y0) / sqrt(a*a + 1)
+
+        float a = m1;
+        float distance = abs( y + (a * x) + b1 * 0.05) / sqrt(a*a + 1.0) - 0.001;
+        float r = 0.2 + 0.5 * sin( x * y * 0.1 + time * 0.02);
+        float g = 0.2 + 0.5 * sin( 0.1*sin(y * 0.1) + time * 0.015);
+        float b = 0.2 + 0.5 * sin( sin(x * 0.2) + time * 0.01);
+        float alpha = 1.0 - distance * 30.0;
+        if (abs(x) < 0.0005 || abs(y) < 0.0005)
+        {
+            color = vec4(0,0,0,1);
+        }
+        else if ((abs(x) < 0.01 || abs(y) < 0.01) && (mod(y,0.05) < 0.001 || mod(x,0.05) < 0.001))
+        {
+            color = vec4(0,0,0,1);
+        }
+        else if ((abs(x) < 0.005 || abs(y) < 0.005) && (mod(y,0.025) < 0.001 || mod(x,0.025) < 0.001))
+        {
+            color = vec4(0,0,0,1);
+        }
+        else if (distance < 10.0)
+        {
+            color = vec4(r,g,b,alpha);
         }
 
-        float r = sqrt(dx*dx + dy*dy);
-        
-        float theta = degrees(atan(dy,dx));
+  
 
-        float spiral = mod(theta - circle_size * 20.0 * r, 360.0);
-        float amod = mod(theta+time-120.0*log(r), 30.0) ;
-        if (spiral < 20.0){
-            color = vec4( 0.0, 0.0, 0.0, 1.0 );
-        }
-        
         gl_FragColor = color;
 
     }`;
@@ -128,13 +148,14 @@ let leaves = PIXI.Texture.from('leaves.jpg');
 const uniforms = {
     uSampler2: leaves,
     time: 0,
-    circle_size: 65,
+    m1: 0,
+    b1: 0
 };
 
 const circleShader = PIXI.Shader.from(vertexSrc, fragmentSrc, uniforms);
 const lineShader = PIXI.Shader.from(vertexSrc, lineFragmentSrc, uniforms);
 
-const quad = new PIXI.Mesh(geometry, circleShader);
+const quad = new PIXI.Mesh(geometry, lineShader);
 
 quad.position.set(w/2, h/2);
 quad.scale.set(4);
@@ -152,8 +173,20 @@ var slider = document.getElementById("sliderInput");
 
 function handleSlider (value)
 {
-    quad.shader.uniforms.circle_size = value;
+    quad.shader.uniforms.m1 = value;
+    var text = " y<sub>1</sub> = " + (value) + "x";
+    text += ((quad.shader.uniforms.b1 >= 0) ? " + " : " - ") + Math.abs(quad.shader.uniforms.b1);
+    document.getElementById("equation").innerHTML = text;
 }
+
+function handleB1 (value)
+{
+    quad.shader.uniforms.b1 = value;
+    var text = " y<sub>1</sub> = " + (quad.shader.uniforms.m1) + "x";
+    text += ((quad.shader.uniforms.b1 >= 0) ? " + " : " - ") + Math.abs(quad.shader.uniforms.b1);
+    document.getElementById("equation").innerHTML = text;
+}
+
 
 
 // Listen for window resize events
@@ -162,24 +195,22 @@ window.addEventListener('resize', resize);
 // Resize function window
 function resize() {
 	// Resize the renderer
-    app.renderer.resize(window.innerWidth, window.innerHeight);
-    
+    app.renderer.resize(window.innerWidth, window.innerHeight);    
   
   // You can use the 'screen' property as the renderer visible
   // area, this is more useful than view.width/height because
   // it handles resolution
   quad.position.set(app.screen.width/2, app.screen.height/2);
-  quad.shape
 
   var ratio = app.screen.width / app.screen.height;
 
-  var short_side = app.screen.width;
+  var tall_side = app.screen.height;
 
   if (ratio > 1){
-    short_side = app.screen.height;
+    tall_side = app.screen.width;
   }
 
-  quad.scale.set(short_side/200);
+  quad.scale.set(tall_side/200);
 
 }
 
