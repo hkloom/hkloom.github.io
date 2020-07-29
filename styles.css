@@ -59,7 +59,7 @@ canvas {
 .slider {
     -webkit-appearance: none;
     width: 100%;
-    height: 3em;
+    height: 2em;
     border-radius: 3em;  
     background: #cecdcd;
     outline: none;
@@ -71,16 +71,16 @@ canvas {
   .slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 5em;
-    height: 5em;
+    width: 3em;
+    height: 3em;
     border-radius: 50%; 
     background: rgb(131, 131, 180);
     cursor: pointer;
   }
   
   .slider::-moz-range-thumb {
-    width: 5em;
-    height: 5em;
+    width: 3em;
+    height: 3em;
     border-radius: 50%;
     background: rgb(131, 131, 180);
     cursor: pointer;
@@ -100,6 +100,8 @@ canvas {
     margin: auto;
     font-family: 'Architect',sans-serif;
     font-size: 3em;
+    background-color: rgb(135, 209, 231);
+    border-radius: 0px 0px 8px 8px;
 }
 
 /* For desktop: */
@@ -130,6 +132,7 @@ canvas {
 
 .menu {
   font-size: large;
+  text-align: center;
 }
 
 .panel {

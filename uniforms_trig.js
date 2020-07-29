@@ -127,7 +127,7 @@ const fragmentSrc = `
         // distance = abs(ax0 + y0) / sqrt(a*a + 1)
 
         float PI = 3.14159;
-        float th = 2.*PI*theta/360.+0.*time/1.;
+        float th = 2.*PI*theta/360.;
         float qx = 5.*(x);
         float qy = 5.*y;
         float px = cos(th);
@@ -146,8 +146,8 @@ const fragmentSrc = `
         {
             if (abs(rad-1.)<.01) {
                 r = 1.;
-                g = 1.;
-                b = 0.;
+                g = .9;
+                b = 0.5;
             }
         }
 
@@ -216,7 +216,13 @@ const fragmentSrc = `
             color = vec4(r,g,b,1.);
         }
 
-  
+        float srx = qx-px;
+        float sry = -qy-py;
+        float smini_rad = sqrt(srx*srx+sry*sry);
+
+        if (smini_rad<.025) {
+            color = vec4(1,0,0,1);
+        }
 
         gl_FragColor = color;
 
@@ -241,12 +247,21 @@ quad.position.set(w/2, h/2);
 quad.scale.set(4);
 
 app.stage.addChild(quad);
+app.ticker.speed = 0;
 
 // start the animation..
 // requestAnimationFrame(animate);
 
 app.ticker.add((delta) => {
-    quad.shader.uniforms.time += 0.0001;
+    quad.shader.uniforms.time += delta;
+    if (app.ticker.speed > 0){
+        quad.shader.uniforms.theta = (quad.shader.uniforms.theta + delta) % 360;
+        var rounded = Math.round(quad.shader.uniforms.theta);
+        var thetaText = "&theta; = " + rounded + "&deg;";
+        document.getElementById("slider1").innerHTML = thetaText;
+
+        document.getElementById("sliderInput").value = rounded;
+    }
 });
 
 var slider = document.getElementById("sliderInput");
@@ -254,12 +269,14 @@ var slider = document.getElementById("sliderInput");
 function handleSlider (value)
 {
     quad.shader.uniforms.theta = value;
-    var text = " y<sub>1</sub> = " + (value) + "x";
-    text += ((quad.shader.uniforms.b1 >= 0) ? " + " : " - ") + Math.abs(quad.shader.uniforms.b1);
-    document.getElementById("equation").innerHTML = text;
 
     var thetaText = "&theta; = " + value + "&deg;";
     document.getElementById("slider1").innerHTML = thetaText;
+}
+
+function handleSpeed (value)
+{
+    app.ticker.speed = value;
 }
 
 function handleTrianglePhase (value)
