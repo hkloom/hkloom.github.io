@@ -61,27 +61,10 @@ const fragmentSrc = `
 
     uniform sampler2D uSampler2;
     uniform float time;
-    uniform float circle_size;
+    uniform float m1;
 
     void main() {
-
-        float dx = vUvs.x - 0.5;
-        float dy = vUvs.y - 0.5;
-
-        float x = mod(vUvs.x * 1.0,1.0);
-        float y = mod(vUvs.y * 1.0,1.0);
-
-        float r = 0.2 + 0.5 * sin(tan(x+y)*0.0 + circle_size * 0.1);
-        float g = 0.2 + 0.5 * sin( 2.0*sin(y * 3.0) + time * 0.1);
-        float b = 0.2 + 0.5 * sin( sin(x * 6.0) + time * 0.1);
-        
-        float distance = circle_size / 300.0 - sqrt(dx*dx + dy*dy);
-        float alpha = distance * 10.0;
-            gl_FragColor = vec4(r,g,b,alpha);
-            //gl_FragColor = texture2D(uSampler2, vec2(x + 0.1*sin(time), y));
-
-        //float distance2edge = abs(dx - 0.5) - 0.5;
-        //gl_FragColor = vec4(0,1,0,pow(distance2edge * 2.0, 0.2));
+        gl_FragColor = vec4(1,0,0,1);
     }`;
 
 
@@ -137,8 +120,6 @@ const fragmentSrc = `
             color = vec4(r,g,b,alpha);
         }
 
-  
-
         gl_FragColor = color;
 
     }`;
@@ -187,7 +168,10 @@ function handleB1 (value)
     document.getElementById("equation").innerHTML = text;
 }
 
-
+function handleUdosButton(value)
+{
+    alert("Hi!");
+}
 
 // Listen for window resize events
 window.addEventListener('resize', resize);
