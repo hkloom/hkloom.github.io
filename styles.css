@@ -127,3 +127,19 @@ canvas {
   font-family: "Architect";
   src: url("ArchitectsDaughter-Regular.ttf");
 }
+
+.menu {
+  font-size: large;
+}
+
+.panel {
+  padding: 5px;
+  border-radius: 8px;
+}
+
+.sliders
+{
+  position: absolute;
+  bottom: 50px;
+  width: 450px;
+}
