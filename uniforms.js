@@ -99,7 +99,7 @@ const fragmentSrc = `
 
     void main() {
 
-        float x = vUvs.x - 0.5;
+        float x = vUvs.x - 0.25;
         float y = vUvs.y - 0.5;
 
         vec4 color = vec4(1,1,1,0);
@@ -114,13 +114,61 @@ const fragmentSrc = `
         // let b = 1, c = 0
         // distance = abs(ax0 + y0) / sqrt(a*a + 1)
 
-        float a = m1;
-        float distance = abs( y + (a * x) + b1 * 0.05) / sqrt(a*a + 1.0) - 0.001;
-        float r = 0.2 + 0.5 * sin( x * y * 0.1 + time * 0.02);
-        float g = 0.2 + 0.5 * sin( 0.1*sin(y * 0.1) + time * 0.015);
-        float b = 0.2 + 0.5 * sin( sin(x * 0.2) + time * 0.01);
-        float alpha = 1.0 - distance * 30.0;
-        if (abs(x) < 0.0005 || abs(y) < 0.0005)
+        float PI = 3.14159;
+        float th = m1/2.+time/15.;
+        float qx = 5.*(x);
+        float qy = 5.*y;
+        float px = cos(th);
+        float py = sin(th);
+        
+        float a = tan(th);
+        float distance = abs( qy + (a * qx) + b1 * 0.05) / sqrt(a*a + 1.0) - 0.001;
+        float r = 1.; 
+        float g = 1.;
+        float b = 1.;
+        float alpha = 1.0;
+
+        float rad = sqrt(qx*qx+qy*qy);
+        if (abs(rad-1.)<.01) {
+            r = 1.;
+            g = 1.;
+            b = 0.;
+        }
+
+        if (abs(qy)<.01 && px/abs(px)*qx<px/abs(px)*px && px/abs(px)*qx>0.) {
+            g=0.;
+            b=0.;
+        }
+        if (abs(qx-px)<.01 && -py/abs(py)*qy<py/abs(py)*py && -py/abs(py)*qy>0.) {
+            b=0.;
+            r=0.;
+        }
+
+        if (abs(-qy-py)<.01 && qx>px && qx<1.5) {
+            r=0.8;
+            g=0.8;
+            b=0.8;
+        }
+
+        float rx = qx-1.5;
+        float ry = -qy-py;
+        float mini_rad = sqrt(rx*rx+ry*ry);
+
+        float func = sin(3.*rx-th);
+
+        if (abs(qy-func)<.02 && qx>1.5) {
+            r = 1.;
+            g=.5;
+            b=0.;
+        }
+
+        if (mini_rad<.02) {
+            r = 1.;
+            g = 0.;
+            b = 0.;
+        }
+
+        if (abs(x) < 0.001 || abs(y) < 0.0005)
         {
             color = vec4(0,0,0,1);
         }
@@ -132,9 +180,12 @@ const fragmentSrc = `
         {
             color = vec4(0,0,0,1);
         }
-        else if (distance < 10.0)
+        else if (distance < .01 && px/abs(px)*qx<px/abs(px)*px && px/abs(px)*qx>0. && -py/abs(py)*qy<py/abs(py)*py && -py/abs(py)*qy>0.)
         {
-            color = vec4(r,g,b,alpha);
+            color = vec4(0.,0.,1.,1.);
+        }
+        else {
+            color = vec4(r,g,b,1.);
         }
 
   
