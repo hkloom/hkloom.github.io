@@ -180,14 +180,16 @@ const fragmentSrc = `
             float mini_rad = sqrt(rx*rx+ry*ry);
 
             float func = sin(3.*rx-th);
+            float dydx = 3.*cos(3.*rx-th);
+            float thick = .015*sqrt(dydx*dydx+1.);
 
-            if (abs(qy-func)<.02 && qx>1.5) {
+            if (abs(qy-func)<thick && qx>1.5) {
                 r = 1.;
                 g=.6;
                 b=0.3;
             }
 
-            if (mini_rad<.02) {
+            if (mini_rad<.03) {
                 r = 1.;
                 g = 0.;
                 b = 0.;
