@@ -268,15 +268,26 @@ var slider = document.getElementById("sliderInput");
 
 function handleSlider (value)
 {
-    quad.shader.uniforms.theta = value;
+    if (app.ticker.speed == 0)
+    {
+        quad.shader.uniforms.theta = value;
 
-    var thetaText = "&theta; = " + value + "&deg;";
-    document.getElementById("slider1").innerHTML = thetaText;
+        var thetaText = "&theta; = " + value + "&deg;";
+        document.getElementById("slider1").innerHTML = thetaText;
+    }
 }
 
 function handleSpeed (value)
 {
     app.ticker.speed = value;
+    if (app.ticker.speed > 0)
+    {
+        document.getElementById("sliderInput").readOnly = true;
+    }
+    else
+    {
+        document.getElementById("sliderInput").readOnly = false;
+    }
 }
 
 function handleTrianglePhase (value)
