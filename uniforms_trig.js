@@ -99,9 +99,20 @@ const fragmentSrc = `
     uniform int phase;
 
     void main() {
-
-        float x = vUvs.x - 0.25;
+        float x = vUvs.x - 0.5;
         float y = vUvs.y - 0.5;
+        
+        if (phase<3) {
+            x*=.7;
+            y*=.7;
+        }
+
+        else {
+            x+=.25;
+            x*=1.2;
+            y*=1.2;
+        }
+        
 
         vec4 color = vec4(1,1,1,0);
 
@@ -116,7 +127,7 @@ const fragmentSrc = `
         // distance = abs(ax0 + y0) / sqrt(a*a + 1)
 
         float PI = 3.14159;
-        float th = theta/2.+time/15.;
+        float th = 2.*PI*theta/360.+0.*time/1.;
         float qx = 5.*(x);
         float qy = 5.*y;
         float px = cos(th);
@@ -129,9 +140,10 @@ const fragmentSrc = `
         float b = 1.;
         float alpha = 1.0;
 
+        float rad = sqrt(qx*qx+qy*qy);
+
         if (phase > 1)
         {
-            float rad = sqrt(qx*qx+qy*qy);
             if (abs(rad-1.)<.01) {
                 r = 1.;
                 g = 1.;
@@ -139,54 +151,64 @@ const fragmentSrc = `
             }
         }
 
+        float theta = atan(qy,-qx);
+        if (theta+PI<th && rad<.2) {
+            r = 1.;
+            g = .95;
+            b = 0.5;
+        }
+
         if (abs(qy)<.01 && px/abs(px)*qx<px/abs(px)*px && px/abs(px)*qx>0.) {
             g=0.;
             b=0.;
         }
         if (abs(qx-px)<.01 && -py/abs(py)*qy<py/abs(py)*py && -py/abs(py)*qy>0.) {
-            b=0.;
-            r=0.;
+            b=0.2;
+            r=0.2;
+            g=.7;
         }
 
-        if (abs(-qy-py)<.01 && qx>px && qx<1.5) {
-            r=0.8;
-            g=0.8;
-            b=0.8;
-        }
+        if (phase>2) {
+            if (abs(-qy-py)<.01 && qx>px && qx<1.5) {
+                r=0.8;
+                g=0.8;
+                b=0.8;
+            }
 
-        float rx = qx-1.5;
-        float ry = -qy-py;
-        float mini_rad = sqrt(rx*rx+ry*ry);
+            float rx = qx-1.5;
+            float ry = -qy-py;
+            float mini_rad = sqrt(rx*rx+ry*ry);
 
-        float func = sin(3.*rx-th);
+            float func = sin(3.*rx-th);
 
-        if (abs(qy-func)<.02 && qx>1.5) {
-            r = 1.;
-            g=.5;
-            b=0.;
-        }
+            if (abs(qy-func)<.02 && qx>1.5) {
+                r = 1.;
+                g=.6;
+                b=0.3;
+            }
 
-        if (mini_rad<.02) {
-            r = 1.;
-            g = 0.;
-            b = 0.;
+            if (mini_rad<.02) {
+                r = 1.;
+                g = 0.;
+                b = 0.;
+            }
         }
 
         if (abs(x) < 0.001 || abs(y) < 0.0005)
         {
             color = vec4(0,0,0,1);
         }
-        else if ((abs(x) < 0.01 || abs(y) < 0.01) && (mod(y,0.05) < 0.001 || mod(x,0.05) < 0.001))
+        else if ((abs(x) < 0.02 || abs(y) < 0.02) && (mod(y,0.2) < 0.001 || mod(x,0.2) < 0.001))
         {
             color = vec4(0,0,0,1);
         }
-        else if ((abs(x) < 0.005 || abs(y) < 0.005) && (mod(y,0.025) < 0.001 || mod(x,0.025) < 0.001))
+        else if ((abs(x) < 0.005 || abs(y) < 0.005) && (mod(y,0.05) < 0.001 || mod(x,0.05) < 0.001))
         {
             color = vec4(0,0,0,1);
         }
         else if (distance < .01 && px/abs(px)*qx<px/abs(px)*px && px/abs(px)*qx>0. && -py/abs(py)*qy<py/abs(py)*py && -py/abs(py)*qy>0.)
         {
-            color = vec4(0.,0.,1.,1.);
+            color = vec4(0.2,0.5,.9,1.);
         }
         else {
             color = vec4(r,g,b,1.);
@@ -243,6 +265,7 @@ function handleTrianglePhase (value)
     quad.shader.uniforms.phase = 1;
     document.getElementById("panel1").style.display = "block";
     document.getElementById("panel2").style.display = "none";
+    document.getElementById("panel3").style.display = "none";
 }
 
 function handleCirclePhase (value)
@@ -250,6 +273,15 @@ function handleCirclePhase (value)
     quad.shader.uniforms.phase = 2;
     document.getElementById("panel1").style.display = "none";
     document.getElementById("panel2").style.display = "block";
+    document.getElementById("panel3").style.display = "none";
+}
+
+function handleSinePhase (value)
+{
+    quad.shader.uniforms.phase = 3;
+    document.getElementById("panel1").style.display = "none";
+    document.getElementById("panel2").style.display = "none";
+    document.getElementById("panel3").style.display = "block";
 }
 
 
