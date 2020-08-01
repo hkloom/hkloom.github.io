@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 2</title>
+</head>
+  <link rel="stylesheet" href="styles.css">
+  <script src="pixi.min.js"></script>
+<body>
+  <script src="uniforms_3.js"></script>
+  <div id="title">
+    Trigonometry
+    <div class="menu">
+        <input type="radio" id="triangle" name="phase" value="triangle" oninput="handleTrianglePhase(this.value)" checked>
+        <label for="triangle">1</label>
+        <input type="radio" id="circle" name="phase" value="circle" oninput="handleCirclePhase(this.value)">
+        <label for="circle">2</label>
+        <input type="radio" id="sine" name="phase" value="sine" oninput="handleSinePhase(this.value)">
+        <label for="sine">3</label>
+    </div>
+  </div>
+    <div id="instructions" class="col-4">
+      <div class="panel" id="panel1" style="background-color: beige;">
+        a right triangle has two legs and a hypotenuse 
+        <div class="equation">
+            a<sup>2</sup> + b<sup>2</sup> = c<sup>2</sup>
+        </div>
+      </div>
+      <div class="panel" id="panel2" style="background-color: rgb(159, 160, 230); display: none;">
+        if the hypotenuse is 1, the radius is 1 
+        <div class="equation">
+            x<sup>2</sup> + y<sup>2</sup> = 1
+        </div>
+      </div>
+      <div class="panel" id="panel3" style="background-color: rgb(199, 145, 230); display: none;">
+        if we track the height of the right triangle, we draw out the graph of the sine function
+        <div class="equation">
+            y = sin(x)
+        </div>
+      </div>
+      <br>
+    <br>
+<div class="sliders">
+    <div type="text" id="slider1" class="equation">
+        &theta; = 0&deg;
+    </div>
+    <input type="range" min="0" max="360" value="0" step="1" class="slider" id="sliderInput" oninput="handleSlider(this.value)">
+  </div>
+</div>
+</body>
+</html>
