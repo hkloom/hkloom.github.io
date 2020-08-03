@@ -87,7 +87,7 @@ const fragmentSrc = `
 
     const lineFragmentSrc = `
 
-    precision mediump float;
+    precision highp float;
 
     varying vec2 vUvs;
     varying vec4 position;
@@ -134,7 +134,7 @@ const fragmentSrc = `
         float slide = exp(th);
         float h = 1.;
         qx = sqrt(ay*ay+(ax+slide-h)*(ax+slide-h))+h-slide;
-        qy = atan(ay/(ax+slide-h))*slide;
+        qy = atan(ay,ax+slide-h)*slide;
 
         float c1 = 100.;
 
