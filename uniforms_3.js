@@ -97,6 +97,7 @@ const fragmentSrc = `
     uniform float theta;
     uniform float b1;
     uniform int phase;
+    uniform int show_axes;
 
     void main() {
         float x = vUvs.x - 0.5;
@@ -131,9 +132,12 @@ const fragmentSrc = `
         qy -= 2. * PI;
 
         if (abs(qy)<PI && abs(qx-1.)<1.) {
-            if (-cos(16.*qy+PI)>.98 || cos(4.*2.*PI*qx/1.)>.98) {
-                r=0.;
-                g=0.;
+            if (show_axes==1)
+            {
+                if (-cos(16.*qy+PI)>.98 || cos(4.*2.*PI*qx/1.)>.98) {
+                    r=0.;
+                    g=0.;
+                }
             }
             if (abs(qx-f)<.03) {
                 b=0.;
@@ -160,7 +164,8 @@ const uniforms = {
     uSampler2: leaves,
     time: 0,
     theta: 0,
-    b1: 0
+    b1: 0,
+    show_axes: 1
 };
 
 const circleShader = PIXI.Shader.from(vertexSrc, fragmentSrc, uniforms);
@@ -185,7 +190,15 @@ var slider = document.getElementById("sliderInput");
 function handleSlider (value)
 {
     quad.shader.uniforms.theta = value;
-    var thetaText = "&theta; = " + value + "&deg;";
+    var thetaText = "";
+    if (value == 0)
+    {
+        thetaText = "Cartesian";
+    }
+    else if (value == 360)
+    {
+        thetaText = "Polar";
+    }
     document.getElementById("slider1").innerHTML = thetaText;
 }
 
@@ -213,6 +226,16 @@ function handleSinePhase (value)
     document.getElementById("panel3").style.display = "block";
 }
 
+function handleAxes( value )
+{
+    var checkbox = document.getElementById("axes");
+    if (checkbox.checked)
+    {
+        quad.shader.uniforms.show_axes = 1;
+    }else{
+        quad.shader.uniforms.show_axes = 0;
+    }
+}
 
 // Listen for window resize events
 window.addEventListener('resize', resize);
