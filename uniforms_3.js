@@ -115,40 +115,77 @@ const fragmentSrc = `
         float g = 1.;
         float b = 1.;
 
-        float ay = qx;
-        float ax = -qy;
+        float ax = 1.5*sqrt(qx*qx+qy*qy);
+        float ay = atan(qy,-qx)+PI;
 
-        float slide = exp(th);
-        float h = 1.;
-        qx = sqrt(ay*ay+(ax+slide-h)*(ax+slide-h))+h-slide;
-        qy = atan(ay,ax+slide-h)*slide;
-
-        float c1 = 100.;
-
-        float f = 1.-.5*sin(qy*5.);
-        float f2 = 0.1 * qy + .1*PI;
-        qy += 2. * PI;
-        float f3 = 0.1 * qy + .1*PI;
-        qy -= 2. * PI;
-
-        if (abs(qy)<PI && abs(qx-1.)<1.) {
-            if (show_axes==1)
-            {
-                if (-cos(16.*qy+PI)>.98 || cos(4.*2.*PI*qx/1.)>.98) {
-                    r=0.;
-                    g=0.;
-                }
-            }
-            if (abs(qx-f)<.03) {
-                b=0.;
+        if (phase==1) {
+            
+            if ((-cos(8.*ay+PI)>.98 || cos(2.*PI*ax/1.)>.98) && ax<4.) {
+                r=0.;
                 g=0.;
             }
-            if (abs(qx - f2) < .03 || abs(qx - f3) < .03){
-                b = 0.;
-                g = 0.;
-                r = 0.;
+            float rad = 2.;
+            float angle = PI/4.;
+            float px = qx-rad*cos(-angle);
+            float py = qy-rad*sin(-angle);
+            float dist = sqrt(px*px+py*py);
+            
+            if (show_axes==1) {
+                if (ax<1. && ay<angle) {
+                    r=1.;
+                    g=1.;
+                    b=0.5;
+                }
+                if (abs(angle-ay)<.03 && ax/1.5<rad) {
+                    r=0.;
+                    g=.7;
+                    b=0.2;
+                }
             }
 
+            if (dist<.1) {
+                r=1.;
+                g=0.;
+                b=0.;
+            }
+        }
+
+        if (phase==2) {
+            float ay = qx;
+            float ax = -qy;
+
+            float slide = exp(th);
+            float h = 1.;
+            qx = sqrt(ay*ay+(ax+slide-h)*(ax+slide-h))+h-slide;
+            qy = atan(ay,ax+slide-h)*slide;
+
+            float c1 = 100.;
+
+            float f = 1.-.5*sin(qy*5.);
+            float f2 = 0.1 * qy + .1*PI;
+            qy += 2. * PI;
+            float f3 = 0.1 * qy + .1*PI;
+            qy -= 2. * PI;
+
+            if (abs(qy)<PI && abs(qx-1.)<1.) {
+                if (show_axes==1)
+                {
+                    if (-cos(16.*qy+PI)>.98 || cos(4.*2.*PI*qx/1.)>.98) {
+                        r=0.;
+                        g=0.;
+                    }
+                }
+                if (abs(qx-f)<.03) {
+                    b=0.;
+                    g=0.;
+                }
+                if (abs(qx - f2) < .03 || abs(qx - f3) < .03){
+                    b = 0.;
+                    g = 0.;
+                    r = 0.;
+                }
+
+            }
         }
 
         color = vec4(r,g,b,1.);
