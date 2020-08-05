@@ -95,78 +95,109 @@ const fragmentSrc = `
     uniform sampler2D uSampler2;
     uniform float time;
     uniform float theta;
+    uniform float m1;
     uniform float b1;
     uniform int phase;
+    uniform int show_axes;
+    uniform float rad;
+    uniform float angle;
+    uniform float a1;
+    uniform float n1;
+    uniform float c1;
 
     void main() {
         float x = vUvs.x - 0.5;
         float y = vUvs.y - 0.5;
 
         vec4 color = vec4(1,1,1,0);
-
-
-        // y = x
-        float f = y - ( x );
+        float theta2 = 360. - theta;
 
         float PI = 3.14159;
-        float th = 2.*PI*theta/360.+0.*time/1.;
+        float th = 2.*PI*theta2/360.;
         float qx = 10.*(x);
         float qy = 10.*y;
-        float px = cos(th);
-        float py = sin(th);
         
-        float a = tan(th);
-        float distance = abs( qy + (a * qx) + b1 * 0.05) / sqrt(a*a + 1.0) - 0.001;
         float r = 1.; 
         float g = 1.;
         float b = 1.;
-        float alpha = 1.0;
 
-        float rad = sqrt(qx*qx+qy*qy);
-        float ang = atan(qx,qy);
+        float ax = 1.5*sqrt(qx*qx+qy*qy);
+        float ay = atan(qy,-qx)+PI;
 
-        float ax = qx;
-        float ay = qy;
-
-        //qx = (ax)/((ax)*(ax)+ay*ay);
-        //qy = (ay)/((ax)*(ax)+ay*ay);
-
-        float slide = exp(th);
-        float h = 1.;
-        qx = sqrt(ay*ay+(ax+slide-h)*(ax+slide-h))+h-slide;
-        qy = atan(ay,ax+slide-h)*slide;
-
-        float c1 = 100.;
-
-        // ax = qx;
-        // ay = qy;
-
-        // float radius = ax*ax+ay*ay;
-        // qx = radius-radius*radius/2.+radius*radius*radius/3.-radius*radius*radius*radius/4.;//log(ax*ax+ay*ay);
-        // qy = atan(ay,ax);
-        //qx = exp(ax)*cos(ay);
-        //qy = exp(ax)*sin(ay);
-
-        // qx = (ax*ax+ay*ay-1.)/((ax+1.)*(ax+1.)+ay*ay);
-        // qy = (2.*ay)/((ax+1.)*(ax+1.)+ay*ay);
-
-        float theta = atan(qy,-qx);
-        
-        if (abs(qy)<PI && abs(qx-1.)<1.) {
-            if (-cos(16.*qy+PI)>.98 || cos(4.*2.*PI*qx/1.)>.98) {
+        if (phase==1) {
+            
+            if ((-cos(8.*ay+PI)>.98 || cos(2.*PI*ax/1.)>.98) && ax<4.) {
                 r=0.;
                 g=0.;
             }
-            if (abs(qx-1.+.5*sin(qy*5.))<.03) {
-                b=0.;
-                g=0.;
+            //float rad = 2.;
+            float angle2 = angle / 180. * PI;
+            float px = qx-rad/1.5*cos(-angle2);
+            float py = qy-rad/1.5*sin(-angle2);
+            float dist = sqrt(px*px+py*py);
+            
+            if (show_axes==1) {
+                if (ax<1. && ay<angle2) {
+                    r=1.;
+                    g=1.;
+                    b=0.5;
+                }
+                if (abs(angle2-ay)<.03 && ax<rad) {
+                    r=0.;
+                    g=.7;
+                    b=0.2;
+                }
             }
 
+            if (dist<.1) {
+                r=1.;
+                g=0.;
+                b=0.;
+            }
+        }
+
+        if (phase>=2) {
+            float ay = qx;
+            float ax = -qy;
+
+            float slide = exp(th);
+            float h = 1.;
+            qx = sqrt(ay*ay+(ax+slide-h)*(ax+slide-h))+h-slide;
+            qy = atan(ay,ax+slide-h)*slide;
+
+            for (float i=0.; i<4.; i+=1.) {
+                
+                float by = qy-2.*PI*i+6.*PI;
+                float f = c1/4.-a1/4.*sin(by*n1);
+                float f2 = m1/4. * by + b1/4.;
+                if (abs(qy)<PI && abs(qx-1.)<1.) {
+                    if (show_axes==1 && i==0.)
+                    {
+                        if (-cos(16.*qy+PI)>.98 || cos(4.*2.*PI*qx/1.)>.98) {
+                            r=0.;
+                            g=0.;
+                        }
+                    }
+                    if (phase == 4) // sine
+                    {
+                        if (abs(qx-f)<.03) {
+                            b=i/6.;
+                            g=i/4.;
+                        }
+                    }
+                    if (phase == 2) // line
+                    {
+                        if (abs(qx - f2) < .03){
+                            b=i/6.;
+                            g=i/4.;
+                        }
+                    }
+                }
+                
+            }
         }
 
         color = vec4(r,g,b,1.);
-
-  
 
         gl_FragColor = color;
 
@@ -179,7 +210,14 @@ const uniforms = {
     uSampler2: leaves,
     time: 0,
     theta: 0,
-    b1: 0
+    a1: 0,
+    c1: 0,
+    n1: 0,
+    m1: 0,
+    b1: 0,
+    show_axes: 1,
+    rad: 0,
+    angle: 0
 };
 
 const circleShader = PIXI.Shader.from(vertexSrc, fragmentSrc, uniforms);
@@ -201,15 +239,89 @@ app.ticker.add((delta) => {
 
 var slider = document.getElementById("sliderInput");
 
+function rgb(r, g, b){
+    return "rgb("+r+","+g+","+b+")";
+  }
+
 function handleSlider (value)
 {
     quad.shader.uniforms.theta = value;
-    var text = " y<sub>1</sub> = " + (value) + "x";
+
+    color = rgb(255 * 0.3, 255 * (0.3  + 0.4 * value / 360.), 255 * 0.3);
+    color2 = rgb(255 * 0.3, 255 * (0.3  + 0.4 * (360 - value) / 360.), 255 * 0.3);
+
+    document.getElementById("sliderCart").style.color = color2;
+    document.getElementById("sliderPol").style.color = color;
+
+}
+
+function handleLineMode(value)
+{
+    quad.shader.uniforms.phase = 2;
+    document.getElementById("slidersPhase2Line").style.display = "block";
+    document.getElementById("slidersPhase2Sine").style.display = "none";
+}
+
+function handleSineMode(value)
+{
+    quad.shader.uniforms.phase = 4;
+    document.getElementById("slidersPhase2Line").style.display = "none";
+    document.getElementById("slidersPhase2Sine").style.display = "block";
+
+    var text = " y = " + (quad.shader.uniforms.a1) + " * sin(" + (quad.shader.uniforms.n1) + " * x) + " + (quad.shader.uniforms.c1);
+    document.getElementById("equation").innerHTML = text;
+}
+
+function handleASlider(value)
+{
+    quad.shader.uniforms.a1 = value;
+
+    var text = " y = " + (quad.shader.uniforms.a1) + " * sin(" + (quad.shader.uniforms.n1) + " * x) + " + (quad.shader.uniforms.c1);
+    document.getElementById("equation").innerHTML = text;
+}
+
+function handleNSlider(value)
+{
+    quad.shader.uniforms.n1 = value;
+
+    var text = " y = " + (quad.shader.uniforms.a1) + " * sin(" + (quad.shader.uniforms.n1) + " * x) + " + (quad.shader.uniforms.c1);
+    document.getElementById("equation").innerHTML = text;
+}
+
+function handleCSlider(value)
+{
+    quad.shader.uniforms.c1 = value;
+
+    var text = " y = " + (quad.shader.uniforms.a1) + " * sin(" + (quad.shader.uniforms.n1) + " * x) + " + (quad.shader.uniforms.c1);
+    document.getElementById("equation").innerHTML = text;
+}
+
+function handleMSlider(value)
+{
+    quad.shader.uniforms.m1 = value;
+
+    var text = " y = " + (quad.shader.uniforms.m1) + "x";
     text += ((quad.shader.uniforms.b1 >= 0) ? " + " : " - ") + Math.abs(quad.shader.uniforms.b1);
     document.getElementById("equation").innerHTML = text;
+}
 
-    var thetaText = "&theta; = " + value + "&deg;";
-    document.getElementById("slider1").innerHTML = thetaText;
+function handleBSlider(value)
+{
+    quad.shader.uniforms.b1 = value;
+
+    var text = " y = " + (quad.shader.uniforms.m1) + "x";
+    text += ((quad.shader.uniforms.b1 >= 0) ? " + " : " - ") + Math.abs(quad.shader.uniforms.b1);
+    document.getElementById("equation").innerHTML = text;
+}
+
+function handleRSlider(value)
+{
+    quad.shader.uniforms.rad = value;
+}
+
+function handleTSlider(value)
+{
+    quad.shader.uniforms.angle = value;
 }
 
 function handleTrianglePhase (value)
@@ -218,6 +330,9 @@ function handleTrianglePhase (value)
     document.getElementById("panel1").style.display = "block";
     document.getElementById("panel2").style.display = "none";
     document.getElementById("panel3").style.display = "none";
+    document.getElementById("slidersPhase1").style.display = "block";
+    document.getElementById("slidersPhase2").style.display = "none";
+    document.getElementById("equation").style.display = "none";
 }
 
 function handleCirclePhase (value)
@@ -226,6 +341,9 @@ function handleCirclePhase (value)
     document.getElementById("panel1").style.display = "none";
     document.getElementById("panel2").style.display = "block";
     document.getElementById("panel3").style.display = "none";
+    document.getElementById("slidersPhase1").style.display = "none";
+    document.getElementById("slidersPhase2").style.display = "block";
+    document.getElementById("equation").style.display = "block";
 }
 
 function handleSinePhase (value)
@@ -236,6 +354,16 @@ function handleSinePhase (value)
     document.getElementById("panel3").style.display = "block";
 }
 
+function handleAxes( value )
+{
+    var checkbox = document.getElementById("axes");
+    if (checkbox.checked)
+    {
+        quad.shader.uniforms.show_axes = 1;
+    }else{
+        quad.shader.uniforms.show_axes = 0;
+    }
+}
 
 // Listen for window resize events
 window.addEventListener('resize', resize);

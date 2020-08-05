@@ -146,3 +146,16 @@ canvas {
   bottom: 50px;
   width: 450px;
 }
+
+.sidebside
+{
+  display: flex;
+  justify-content: space-between;
+  width: 450px;
+}
+
+.sbs
+{
+  font-weight: bold;
+  padding: 5px;
+}
