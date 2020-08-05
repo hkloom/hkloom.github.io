@@ -95,9 +95,15 @@ const fragmentSrc = `
     uniform sampler2D uSampler2;
     uniform float time;
     uniform float theta;
+    uniform float m1;
     uniform float b1;
     uniform int phase;
     uniform int show_axes;
+    uniform float rad;
+    uniform float angle;
+    uniform float a1;
+    uniform float n1;
+    uniform float c1;
 
     void main() {
         float x = vUvs.x - 0.5;
@@ -124,19 +130,19 @@ const fragmentSrc = `
                 r=0.;
                 g=0.;
             }
-            float rad = 2.;
-            float angle = PI/4.;
-            float px = qx-rad*cos(-angle);
-            float py = qy-rad*sin(-angle);
+            //float rad = 2.;
+            float angle2 = angle / 180. * PI;
+            float px = qx-rad/1.5*cos(-angle2);
+            float py = qy-rad/1.5*sin(-angle2);
             float dist = sqrt(px*px+py*py);
             
             if (show_axes==1) {
-                if (ax<1. && ay<angle) {
+                if (ax<1. && ay<angle2) {
                     r=1.;
                     g=1.;
                     b=0.5;
                 }
-                if (abs(angle-ay)<.03 && ax/1.5<rad) {
+                if (abs(angle2-ay)<.03 && ax<rad) {
                     r=0.;
                     g=.7;
                     b=0.2;
@@ -150,7 +156,7 @@ const fragmentSrc = `
             }
         }
 
-        if (phase==2) {
+        if (phase>=2) {
             float ay = qx;
             float ax = -qy;
 
@@ -159,12 +165,10 @@ const fragmentSrc = `
             qx = sqrt(ay*ay+(ax+slide-h)*(ax+slide-h))+h-slide;
             qy = atan(ay,ax+slide-h)*slide;
 
-            float c1 = 100.;
-
-            float f = 1.-.5*sin(qy*5.);
-            float f2 = 0.1 * qy + .1*PI;
+            float f = c1-a1*sin(qy*n1);
+            float f2 = m1 * qy + m1*PI;
             qy += 2. * PI;
-            float f3 = 0.1 * qy + .1*PI;
+            float f3 = m1 * qy + m1*PI;
             qy -= 2. * PI;
 
             if (abs(qy)<PI && abs(qx-1.)<1.) {
@@ -175,16 +179,21 @@ const fragmentSrc = `
                         g=0.;
                     }
                 }
-                if (abs(qx-f)<.03) {
-                    b=0.;
-                    g=0.;
+                if (phase == 4) // sine
+                {
+                    if (abs(qx-f)<.03) {
+                        b=0.;
+                        g=0.;
+                    }
                 }
-                if (abs(qx - f2) < .03 || abs(qx - f3) < .03){
-                    b = 0.;
-                    g = 0.;
-                    r = 0.;
+                if (phase == 2) // line
+                {
+                    if (abs(qx - f2) < .03 || abs(qx - f3) < .03){
+                        b = 0.;
+                        g = 0.;
+                        r = 0.;
+                    }
                 }
-
             }
         }
 
@@ -201,8 +210,14 @@ const uniforms = {
     uSampler2: leaves,
     time: 0,
     theta: 0,
+    a1: 0,
+    c1: 0,
+    n1: 0,
+    m1: 0,
     b1: 0,
-    show_axes: 1
+    show_axes: 1,
+    rad: 0,
+    angle: 0
 };
 
 const circleShader = PIXI.Shader.from(vertexSrc, fragmentSrc, uniforms);
@@ -240,12 +255,84 @@ function handleSlider (value)
 
 }
 
+function handleLineMode(value)
+{
+    quad.shader.uniforms.phase = 2;
+    document.getElementById("slidersPhase2Line").style.display = "block";
+    document.getElementById("slidersPhase2Sine").style.display = "none";
+}
+
+function handleSineMode(value)
+{
+    quad.shader.uniforms.phase = 4;
+    document.getElementById("slidersPhase2Line").style.display = "none";
+    document.getElementById("slidersPhase2Sine").style.display = "block";
+
+    var text = " y = " + (quad.shader.uniforms.a1) + " * sin(" + (quad.shader.uniforms.n1) + " * x) + " + (quad.shader.uniforms.c1);
+    document.getElementById("equation").innerHTML = text;
+}
+
+function handleASlider(value)
+{
+    quad.shader.uniforms.a1 = value;
+
+    var text = " y = " + (quad.shader.uniforms.a1) + " * sin(" + (quad.shader.uniforms.n1) + " * x) + " + (quad.shader.uniforms.c1);
+    document.getElementById("equation").innerHTML = text;
+}
+
+function handleNSlider(value)
+{
+    quad.shader.uniforms.n1 = value;
+
+    var text = " y = " + (quad.shader.uniforms.a1) + " * sin(" + (quad.shader.uniforms.n1) + " * x) + " + (quad.shader.uniforms.c1);
+    document.getElementById("equation").innerHTML = text;
+}
+
+function handleCSlider(value)
+{
+    quad.shader.uniforms.c1 = value;
+
+    var text = " y = " + (quad.shader.uniforms.a1) + " * sin(" + (quad.shader.uniforms.n1) + " * x) + " + (quad.shader.uniforms.c1);
+    document.getElementById("equation").innerHTML = text;
+}
+
+function handleMSlider(value)
+{
+    quad.shader.uniforms.m1 = value;
+
+    var text = " y = " + (quad.shader.uniforms.m1) + "x";
+    text += ((quad.shader.uniforms.b1 >= 0) ? " + " : " - ") + Math.abs(quad.shader.uniforms.b1);
+    document.getElementById("equation").innerHTML = text;
+}
+
+function handleBSlider(value)
+{
+    quad.shader.uniforms.b1 = value;
+
+    var text = " y = " + (quad.shader.uniforms.m1) + "x";
+    text += ((quad.shader.uniforms.b1 >= 0) ? " + " : " - ") + Math.abs(quad.shader.uniforms.b1);
+    document.getElementById("equation").innerHTML = text;
+}
+
+function handleRSlider(value)
+{
+    quad.shader.uniforms.rad = value;
+}
+
+function handleTSlider(value)
+{
+    quad.shader.uniforms.angle = value;
+}
+
 function handleTrianglePhase (value)
 {
     quad.shader.uniforms.phase = 1;
     document.getElementById("panel1").style.display = "block";
     document.getElementById("panel2").style.display = "none";
     document.getElementById("panel3").style.display = "none";
+    document.getElementById("slidersPhase1").style.display = "block";
+    document.getElementById("slidersPhase2").style.display = "none";
+    document.getElementById("equation").style.display = "none";
 }
 
 function handleCirclePhase (value)
@@ -254,6 +341,9 @@ function handleCirclePhase (value)
     document.getElementById("panel1").style.display = "none";
     document.getElementById("panel2").style.display = "block";
     document.getElementById("panel3").style.display = "none";
+    document.getElementById("slidersPhase1").style.display = "none";
+    document.getElementById("slidersPhase2").style.display = "block";
+    document.getElementById("equation").style.display = "block";
 }
 
 function handleSinePhase (value)
