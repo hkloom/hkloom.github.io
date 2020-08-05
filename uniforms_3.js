@@ -87,7 +87,7 @@ const fragmentSrc = `
 
     const lineFragmentSrc = `
 
-    precision highp float;
+    precision mediump float;
 
     varying vec2 vUvs;
     varying vec4 position;
@@ -329,7 +329,6 @@ function handleTrianglePhase (value)
     quad.shader.uniforms.phase = 1;
     document.getElementById("panel1").style.display = "block";
     document.getElementById("panel2").style.display = "none";
-    document.getElementById("panel3").style.display = "none";
     document.getElementById("slidersPhase1").style.display = "block";
     document.getElementById("slidersPhase2").style.display = "none";
     document.getElementById("equation").style.display = "none";
@@ -340,18 +339,9 @@ function handleCirclePhase (value)
     quad.shader.uniforms.phase = 2;
     document.getElementById("panel1").style.display = "none";
     document.getElementById("panel2").style.display = "block";
-    document.getElementById("panel3").style.display = "none";
     document.getElementById("slidersPhase1").style.display = "none";
     document.getElementById("slidersPhase2").style.display = "block";
     document.getElementById("equation").style.display = "block";
-}
-
-function handleSinePhase (value)
-{
-    quad.shader.uniforms.phase = 3;
-    document.getElementById("panel1").style.display = "none";
-    document.getElementById("panel2").style.display = "none";
-    document.getElementById("panel3").style.display = "block";
 }
 
 function handleAxes( value )

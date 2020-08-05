@@ -16,8 +16,6 @@
         <label for="triangle">1</label>
         <input type="radio" id="circle" name="phase" value="circle" oninput="handleCirclePhase(this.value)">
         <label for="circle">2</label>
-        <input type="radio" id="sine" name="phase" value="sine" oninput="handleSinePhase(this.value)">
-        <label for="sine">3</label>
         <br>
         <input type="checkbox" id="axes" oninput="handleAxes(this.value)" checked>
         <label for="axes">Show Axes</label>
@@ -30,12 +28,6 @@
       </div>
       <div class="panel" id="panel2" style="background-color: rgb(159, 160, 230); display: none;">
         we can visualize a transition from cartesian to polar
-      </div>
-      <div class="panel" id="panel3" style="background-color: rgb(199, 145, 230); display: none;">
-        if we track the height of the right triangle, we draw out the graph of the sine function
-        <div class="equation">
-            y = sin(x)
-        </div>
       </div>
       <br>
       <div type="text" id="equation" value="y = 0*x" class="equation" style="display: none;">
