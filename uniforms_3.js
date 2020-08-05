@@ -187,19 +187,20 @@ app.ticker.add((delta) => {
 
 var slider = document.getElementById("sliderInput");
 
+function rgb(r, g, b){
+    return "rgb("+r+","+g+","+b+")";
+  }
+
 function handleSlider (value)
 {
     quad.shader.uniforms.theta = value;
-    var thetaText = "";
-    if (value == 0)
-    {
-        thetaText = "Cartesian";
-    }
-    else if (value == 360)
-    {
-        thetaText = "Polar";
-    }
-    document.getElementById("slider1").innerHTML = thetaText;
+
+    color = rgb(255 * 0.3, 255 * (0.3  + 0.4 * value / 360.), 255 * 0.3);
+    color2 = rgb(255 * 0.3, 255 * (0.3  + 0.4 * (360 - value) / 360.), 255 * 0.3);
+
+    document.getElementById("sliderCart").style.color = color2;
+    document.getElementById("sliderPol").style.color = color;
+
 }
 
 function handleTrianglePhase (value)
