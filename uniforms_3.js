@@ -165,35 +165,35 @@ const fragmentSrc = `
             qx = sqrt(ay*ay+(ax+slide-h)*(ax+slide-h))+h-slide;
             qy = atan(ay,ax+slide-h)*slide;
 
-            float f = c1-a1*sin(qy*n1);
-            float f2 = m1 * qy + m1*PI;
-            qy += 2. * PI;
-            float f3 = m1 * qy + m1*PI;
-            qy -= 2. * PI;
-
-            if (abs(qy)<PI && abs(qx-1.)<1.) {
-                if (show_axes==1)
-                {
-                    if (-cos(16.*qy+PI)>.98 || cos(4.*2.*PI*qx/1.)>.98) {
-                        r=0.;
-                        g=0.;
+            for (float i=0.; i<4.; i+=1.) {
+                
+                float by = qy-2.*PI*i+6.*PI;
+                float f = c1/4.-a1/4.*sin(by*n1);
+                float f2 = m1/4. * by + b1/4.;
+                if (abs(qy)<PI && abs(qx-1.)<1.) {
+                    if (show_axes==1 && i==0.)
+                    {
+                        if (-cos(16.*qy+PI)>.98 || cos(4.*2.*PI*qx/1.)>.98) {
+                            r=0.;
+                            g=0.;
+                        }
+                    }
+                    if (phase == 4) // sine
+                    {
+                        if (abs(qx-f)<.03) {
+                            b=i/6.;
+                            g=i/4.;
+                        }
+                    }
+                    if (phase == 2) // line
+                    {
+                        if (abs(qx - f2) < .03){
+                            b=i/6.;
+                            g=i/4.;
+                        }
                     }
                 }
-                if (phase == 4) // sine
-                {
-                    if (abs(qx-f)<.03) {
-                        b=0.;
-                        g=0.;
-                    }
-                }
-                if (phase == 2) // line
-                {
-                    if (abs(qx - f2) < .03 || abs(qx - f3) < .03){
-                        b = 0.;
-                        g = 0.;
-                        r = 0.;
-                    }
-                }
+                
             }
         }
 
