@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 3</title>
+</head>
+  <link rel="stylesheet" href="styles.css">
+  <script src="pixi.min.js"></script>
+<body>
+  <script src="uniforms_4.js"></script>
+  <div id="title">
+    Graphing
+    <div class="menu">
+        <input type="radio" id="triangle" name="phase" value="triangle" oninput="handleTrianglePhase(this.value)" checked>
+        <label for="triangle">1</label>
+        <input type="radio" id="circle" name="phase" value="circle" oninput="handleCirclePhase(this.value)">
+        <label for="circle">2</label>
+        <br>
+        <input type="checkbox" id="axes" oninput="handleAxes(this.value)" checked>
+        <label for="axes">Show Axes</label>
+    </div>
+  </div>
+    <div id="instructions" class="col-4">
+      <div class="panel" id="panel1" style="background-color: beige;">
+        a Cartesian graph uses x and y <br>
+        a Polar graph uses r and &theta;
+      </div>
+      <div class="panel" id="panel2" style="background-color: rgb(159, 160, 230); display: none;">
+        we can visualize a transition from cartesian to polar
+      </div>
+      <br>
+      <div type="text" id="equation" value="y = 0*x" class="equation" style="display: none;">
+        y = mx + b
+      </div>
+    <br>
+<div class="sliders">
+  <div id="slidersPhase1">
+      <div type="text" id="" value="y = 0*x" class="equation">
+        radius ( <i>r</i> ) 
+    <input type="range" min="0" max="4" value="0" step="0.1" class="slider" id="rSlider" oninput="handleRSlider(this.value)">
+      
+    </div>
+    <div type="text" id="" value="y = 0*x" class="equation">
+      angle ( <i>&theta;</i> )
+    <input type="range" min="0" max="360" value="0" step="5" class="slider" id="tSlider" oninput="handleTSlider(this.value)">
+    </div>
+  </div>
+
+  <div id="slidersPhase2" style="display: none;">
+  <div class="sidebside">
+    <div type="text" id="sliderCart" class="equation sbs" style="color: rgb(77, 179, 77);">
+        Cartesian
+    </div>
+    <div type="text" id="sliderPol" class="equation sbs">
+      Polar
+    </div>
+  </div>
+  <div class="equation">
+    <input type="range" min="0" max="360" value="0" step="1" class="slider" id="sliderInput" oninput="handleSlider(this.value)">
+    <input type="radio" id="line" name="func" value="line" oninput="handleLineMode(this.value)" checked>
+    <label for="line">Line</label>
+    <input type="radio" id="sine" name="func" value="sine" oninput="handleSineMode(this.value)">
+    <label for="sine">Sine</label>
+  </div>
+
+  <div id="slidersPhase2Line">
+    <div type="text" id="" value="y = 0*x" class="equation">
+      m
+  <input type="range" min="0" max="2.4" value="0" step="0.01" class="slider" id="mSlider" oninput="handleMSlider(this.value)">
+    
+  </div>
+  <div type="text" id="" value="y = 0*x" class="equation">
+      b
+  <input type="range" min="0" max="8" value="0" step="0.1" class="slider" id="bSlider" oninput="handleBSlider(this.value)">
+  </div>
+</div>
+
+<div id="slidersPhase2Sine" style="display: none;">
+  
+  <div type="text" id="" value="y = 0*x" class="equation">
+    c
+<input type="range" min="0" max="8" value="0" step="0.05" class="slider" id="cSlider" oninput="handleCSlider(this.value)">
+  
+  
+<div type="text" id="" value="y = 0*x" class="equation">
+    n
+<input type="range" min="0" max="8" value="0" step="0.25" class="slider" id="nSlider" oninput="handleNSlider(this.value)">
+</div>
+
+<div type="text" id="" value="y = 0*x" class="equation">
+  a
+<input type="range" min="0" max="8" value="0" step="0.05" class="slider" id="aSlider" oninput="handleASlider(this.value)">
+
+</div>
+</div>
+
+
+  </div>
+</div>
+</div>
+</body>
+</html>
