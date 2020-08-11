@@ -256,6 +256,14 @@ app.ticker.add((delta) => {
     }
 });
 
+document.addEventListener("DOMContentLoaded", function(){
+    document.getElementById("instructions").style.maxHeight = "250px";
+    document.getElementById("instructions").style.padding = "0em 1em";
+    document.getElementById("slidersPanel").style.maxHeight = "500px";
+    document.getElementById("slidersPanel").style.padding = "0em 1em";
+});
+
+
 function handleSpeed(value) {
     app.ticker.speed = value;
 }
@@ -388,6 +396,24 @@ function handleAxes(value) {
         quad.shader.uniforms.show_axes = 1;
     } else {
         quad.shader.uniforms.show_axes = 0;
+    }
+}
+
+function handleControls(value)
+{
+    var checkbox = document.getElementById("controls");
+    if (checkbox.checked)
+    {
+        document.getElementById("instructions").style.padding = "0em 1em";
+        document.getElementById("instructions").style.maxHeight = "250px";
+        document.getElementById("slidersPanel").style.padding = "0em 1em";
+        document.getElementById("slidersPanel").style.maxHeight = "500px";
+    } 
+    else
+    {
+        document.getElementById("instructions").style.padding = null;
+        document.getElementById("instructions").style.maxHeight = null;
+        document.getElementById("slidersPanel").style.maxHeight = null;
     }
 }
 
