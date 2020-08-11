@@ -1,15 +1,16 @@
 var w = 600;
 var h = 600;
 
-const app = new PIXI.Application(  {width: w,
-                                    height: h,
-                                    backgroundColor: '0x86D0F2',
-                                    transparent: true,
-                                    antialias: true,
-                                    autoResize: true,
-                                    resolution: devicePixelRatio,
-                                    resizeTo: window
-                                });
+const app = new PIXI.Application({
+    width: w,
+    height: h,
+    backgroundColor: '0x86D0F2',
+    transparent: true,
+    antialias: true,
+    autoResize: true,
+    resolution: devicePixelRatio,
+    resizeTo: window
+});
 
 document.body.appendChild(app.view);
 
@@ -21,7 +22,7 @@ const geometry = new PIXI.Geometry()
         [-100, -100, // x, y
             100, -100, // x, y
             100, 100,
-            -100, 100], // x, y
+        -100, 100], // x, y
         2) // the size of the attribute
     .addAttribute('aUvs', // the attribute name
         [0, 0, // u, v
@@ -85,7 +86,7 @@ const fragmentSrc = `
     }`;
 
 
-    const lineFragmentSrc = `
+const lineFragmentSrc = `
 
     precision mediump float;
 
@@ -176,7 +177,7 @@ const fragmentSrc = `
             for (float i=0.; i<4.; i+=1.) {
                 
                 float by = qy-2.*PI*i+6.*PI;
-                float f = c1/4.-a1/4.*sin(by*n1);
+                float f = c1/4.-a1/4.*sin(by*n1 + 0.2*time);
                 float f2 = m1/4. * by + b1/4.;
                 if (abs(qy)<PI && abs(qx-1.)<1.) {
                     if (show_axes==1 && i==0.)
@@ -214,7 +215,7 @@ const fragmentSrc = `
 let leaves = PIXI.Texture.from('leaves.jpg');
 
 const uniforms = {
-    phase: 1,
+    phase: 2,
     uSampler2: leaves,
     time: 0,
     theta: 0,
@@ -233,132 +234,159 @@ const lineShader = PIXI.Shader.from(vertexSrc, lineFragmentSrc, uniforms);
 
 const quad = new PIXI.Mesh(geometry, lineShader);
 
-quad.position.set(w/2, h/2);
+var withTime = false;
+
+quad.position.set(w / 2, h / 2);
 quad.scale.set(4);
 
 app.stage.addChild(quad);
-
-// start the animation..
-// requestAnimationFrame(animate);
+app.ticker.speed = 0;
 
 app.ticker.add((delta) => {
-    quad.shader.uniforms.time += 0.0001;
+    if (!isNaN(delta)) {
+        quad.shader.uniforms.time = parseFloat(quad.shader.uniforms.time) + parseFloat(delta);
+        if (app.ticker.speed > 0) {
+            var rounded = (quad.shader.uniforms.time*0.1).toFixed(1);
+            var thetaText = "time = " + rounded;
+            document.getElementById("sliderTime").innerHTML = thetaText;
+            document.getElementById("time").value = rounded;
+
+            drawSineFunc();
+        }
+    }
 });
+
+function handleSpeed(value) {
+    app.ticker.speed = value;
+}
+
+
+function handleTime(value) {
+    quad.shader.uniforms.time = value * 10;
+    var rounded = (quad.shader.uniforms.time*0.1).toFixed(1);
+    var thetaText = "time = " + rounded;
+    document.getElementById("sliderTime").innerHTML = thetaText;
+    drawSineFunc();
+}
+
+function drawSineFunc() {
+    if (!withTime)
+        var text = " y = " + (quad.shader.uniforms.a1) + " * sin(" + (quad.shader.uniforms.n1) + " * x) + " + (quad.shader.uniforms.c1);
+    else
+        var text = " y = " + (quad.shader.uniforms.a1) + " * sin(" + (quad.shader.uniforms.n1) + " * x + " + (quad.shader.uniforms.time*0.1).toFixed(1) + ") + " + (quad.shader.uniforms.c1);
+
+    document.getElementById("equation").innerHTML = text;
+}
 
 var slider = document.getElementById("sliderInput");
 
-function rgb(r, g, b){
-    return "rgb("+r+","+g+","+b+")";
-  }
+function rgb(r, g, b) {
+    return "rgb(" + r + "," + g + "," + b + ")";
+}
 
-function handleSlider (value)
-{
+function handleSlider(value) {
     quad.shader.uniforms.theta = value;
 
-    color = rgb(255 * 0.3, 255 * (0.3  + 0.4 * value / 360.), 255 * 0.3);
-    color2 = rgb(255 * 0.3, 255 * (0.3  + 0.4 * (360 - value) / 360.), 255 * 0.3);
+    color = rgb(255 * 0.3, 255 * (0.3 + 0.4 * value / 360.), 255 * 0.3);
+    color2 = rgb(255 * 0.3, 255 * (0.3 + 0.4 * (360 - value) / 360.), 255 * 0.3);
 
     document.getElementById("sliderCart").style.color = color2;
     document.getElementById("sliderPol").style.color = color;
 
 }
 
-function handleLineMode(value)
-{
+function handleLineMode(value) {
     quad.shader.uniforms.phase = 2;
     document.getElementById("slidersPhase2Line").style.display = "block";
     document.getElementById("slidersPhase2Sine").style.display = "none";
+
+    var text = " y = " + (quad.shader.uniforms.m1) + " * x";
+    text += ((quad.shader.uniforms.b1 >= 0) ? " + " : " - ") + Math.abs(quad.shader.uniforms.b1);
+    document.getElementById("equation").innerHTML = text;
 }
 
-function handleSineMode(value)
-{
+function handleSineMode(value) {
     quad.shader.uniforms.phase = 4;
     document.getElementById("slidersPhase2Line").style.display = "none";
     document.getElementById("slidersPhase2Sine").style.display = "block";
 
-    var text = " y = " + (quad.shader.uniforms.a1) + " * sin(" + (quad.shader.uniforms.n1) + " * x) + " + (quad.shader.uniforms.c1);
-    document.getElementById("equation").innerHTML = text;
+    drawSineFunc();
 }
 
-function handleASlider(value)
-{
+function handleASlider(value) {
     quad.shader.uniforms.a1 = value;
 
-    var text = " y = " + (quad.shader.uniforms.a1) + " * sin(" + (quad.shader.uniforms.n1) + " * x) + " + (quad.shader.uniforms.c1);
-    document.getElementById("equation").innerHTML = text;
+    drawSineFunc();
 }
 
-function handleNSlider(value)
-{
+function handleNSlider(value) {
     quad.shader.uniforms.n1 = value;
 
-    var text = " y = " + (quad.shader.uniforms.a1) + " * sin(" + (quad.shader.uniforms.n1) + " * x) + " + (quad.shader.uniforms.c1);
-    document.getElementById("equation").innerHTML = text;
+    drawSineFunc();
 }
 
-function handleCSlider(value)
-{
+function handleCSlider(value) {
     quad.shader.uniforms.c1 = value;
 
-    var text = " y = " + (quad.shader.uniforms.a1) + " * sin(" + (quad.shader.uniforms.n1) + " * x) + " + (quad.shader.uniforms.c1);
-    document.getElementById("equation").innerHTML = text;
+    drawSineFunc();
 }
 
-function handleMSlider(value)
-{
+function handleMSlider(value) {
     quad.shader.uniforms.m1 = value;
 
-    var text = " y = " + (quad.shader.uniforms.m1) + "x";
+    var text = " y = " + (quad.shader.uniforms.m1) + " * x";
     text += ((quad.shader.uniforms.b1 >= 0) ? " + " : " - ") + Math.abs(quad.shader.uniforms.b1);
     document.getElementById("equation").innerHTML = text;
 }
 
-function handleBSlider(value)
-{
+function handleBSlider(value) {
     quad.shader.uniforms.b1 = value;
 
-    var text = " y = " + (quad.shader.uniforms.m1) + "x";
+    var text = " y = " + (quad.shader.uniforms.m1) + " * x";
     text += ((quad.shader.uniforms.b1 >= 0) ? " + " : " - ") + Math.abs(quad.shader.uniforms.b1);
     document.getElementById("equation").innerHTML = text;
 }
 
-function handleRSlider(value)
-{
+function handleRSlider(value) {
     quad.shader.uniforms.rad = value;
 }
 
-function handleTSlider(value)
-{
+function handleTSlider(value) {
     quad.shader.uniforms.angle = value;
 }
 
-function handleTrianglePhase (value)
-{
-    quad.shader.uniforms.phase = 1;
+function handleTrianglePhase(value) {
+    withTime = true;
     document.getElementById("panel1").style.display = "block";
     document.getElementById("panel2").style.display = "none";
     document.getElementById("slidersPhase1").style.display = "block";
-    document.getElementById("slidersPhase2").style.display = "none";
-    document.getElementById("equation").style.display = "none";
+    document.getElementById("slidersPhase2").style.display = "block";
+    document.getElementById("equation").style.display = "block";
+    document.getElementById("lineModeButtons").style.display = "none";
+    document.getElementById("sine").checked = true;
+    handleSineMode();
 }
 
-function handleCirclePhase (value)
-{
-    quad.shader.uniforms.phase = 2;
+function handleCirclePhase(value) {
+    if (withTime)
+    {
+        withTime = false;
+        handleSineMode();
+    }
+
     document.getElementById("panel1").style.display = "none";
     document.getElementById("panel2").style.display = "block";
     document.getElementById("slidersPhase1").style.display = "none";
     document.getElementById("slidersPhase2").style.display = "block";
     document.getElementById("equation").style.display = "block";
+    document.getElementById("lineModeButtons").style.display = "inline-block";
 }
 
-function handleAxes( value )
-{
+function handleAxes(value) {
     var checkbox = document.getElementById("axes");
-    if (checkbox.checked)
-    {
+    if (checkbox.checked) {
         quad.shader.uniforms.show_axes = 1;
-    }else{
+    } else {
         quad.shader.uniforms.show_axes = 0;
     }
 }
@@ -368,31 +396,31 @@ window.addEventListener('resize', resize);
 
 // Resize function window
 function resize() {
-	// Resize the renderer
-    app.renderer.resize(window.innerWidth, window.innerHeight);    
-  
-  // You can use the 'screen' property as the renderer visible
-  // area, this is more useful than view.width/height because
-  // it handles resolution
-  quad.position.set(app.screen.width/2, app.screen.height/2);
+    // Resize the renderer
+    app.renderer.resize(window.innerWidth, window.innerHeight);
 
-  var ratio = app.screen.width / app.screen.height;
+    // You can use the 'screen' property as the renderer visible
+    // area, this is more useful than view.width/height because
+    // it handles resolution
+    quad.position.set(app.screen.width / 2, app.screen.height / 2);
 
-  var tall_side = app.screen.height;
+    var ratio = app.screen.width / app.screen.height;
 
-  if (ratio > 1){
-    tall_side = app.screen.width;
-  }
+    var tall_side = app.screen.height;
 
-  quad.scale.set(tall_side/200);
+    if (ratio > 1) {
+        tall_side = app.screen.width;
+    }
+
+    quad.scale.set(tall_side / 200);
 
 }
 
 resize();
 
-screen.orientation.addEventListener("change", function(e) {
+screen.orientation.addEventListener("change", function (e) {
     resize();
-  }, false);
+}, false);
 
 let keysPressed = {};
 
@@ -409,7 +437,7 @@ document.addEventListener('keydown', (event) => {
         quad.shader = lineShader;
     }
 });
- 
- document.addEventListener('keyup', (event) => {
+
+document.addEventListener('keyup', (event) => {
     delete keysPressed[event.key];
- });
+});
