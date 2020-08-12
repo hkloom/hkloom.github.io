@@ -95,6 +95,7 @@ const lineFragmentSrc = `
 
     uniform sampler2D uSampler2;
     uniform float time;
+    uniform float cycles;
     uniform float theta;
     uniform float m1;
     uniform float b1;
@@ -105,6 +106,10 @@ const lineFragmentSrc = `
     uniform float a1;
     uniform float n1;
     uniform float c1;
+    uniform float a2;
+    uniform float n2;
+    uniform float c2;
+    uniform float v;
 
     void main() {
         float x = vUvs.x - 0.5;
@@ -129,16 +134,18 @@ const lineFragmentSrc = `
             float ay = qx;
             float ax = -qy;
 
-            float slide = exp(th);
+            float slide = exp(th*th/5.);
             float h = 1.;
             qx = sqrt(ay*ay+(ax+slide-h)*(ax+slide-h))+h-slide;
             qy = atan(ay,ax+slide-h)*slide;
 
+            const float lim = 4.;
+
             for (float i=0.; i<4.; i+=1.) {
                 
                 float by = qy-2.*PI*i+6.*PI;
-                float f = c1/4.-a1/4.*sin(by*n1);
-                float f2 = m1/4. * by + b1/4.;
+                float f = c1/4.-a1/4.*sin(by*n1+time+cycles);
+                float f2 = m1/4. * (by) *0. + b1/4.;
                 if (abs(qy)<PI && abs(qx-1.)<1.) {
                     if (show_axes==1 && i==0.)
                     {
@@ -150,15 +157,17 @@ const lineFragmentSrc = `
                     if (phase == 4) // sine
                     {
                         if (abs(qx-f)<.03) {
-                            b=i/6.;
-                            g=i/4.;
+                            r = 0.5-.5*sin(2.*PI*i/4.);
+                            g = 0.5-.5*sin(2.*PI*i/4.-2.*PI/3.);
+                            b = 0.5-.5*sin(2.*PI*i/4.+2.*PI/3.);
                         }
                     }
                     if (phase == 2) // line
                     {
                         if (abs(qx - f2) < .03){
-                            b=i/6.;
-                            g=i/4.;
+                            r = 0.5-.5*sin(2.*PI*i/4.);
+                            g = 0.5-.5*sin(2.*PI*i/4.-2.*PI/3.);
+                            b = 0.5-.5*sin(2.*PI*i/4.+2.*PI/3.);
                         }
                     }
                 }
@@ -169,41 +178,58 @@ const lineFragmentSrc = `
             float ay = qx;
             float ax = -qy;
 
-            float slide = exp(th);
+            float slide = exp(th*th/5.);
             float h = 1.;
             qx = sqrt(ay*ay+(ax+slide-h)*(ax+slide-h))+h-slide;
             qy = atan(ay,ax+slide-h)*slide;
 
-            for (float i=0.; i<4.; i+=1.) {
-                
+            for (float i=0.; i<8.; i+=1.) {
+                if (i<cycles) {
                 float by = qy-2.*PI*i+6.*PI;
-                float f = c1/4.-a1/4.*sin(by*n1 + 0.2*time);
-                float f2 = m1/4. * by + b1/4.;
-                if (abs(qy)<PI && abs(qx-1.)<1.) {
+                if (phase == 2){
+                    by = qy+2.*PI*i+6.*PI;
+                }
+                float f = c1/4.-a1/4.*sin(by*n1 - 0.2*time);
+                float dfdx  = -1.*n1*a1/4.*cos(by*n1 - 0.2*time);
+                float thick = sqrt(dfdx*dfdx+1.);
+                float f2 = m1/4. * (by-5.*PI) + b1/4.;
+                float f3 = c1/4.-a1/4.*sin(by*n1 - 0.2*time+a2/4.*sin(n2*by+0.2*v*time));
+                if (abs(qy)<PI && qx>0.) {
                     if (show_axes==1 && i==0.)
                     {
                         if (-cos(16.*qy+PI)>.98 || cos(4.*2.*PI*qx/1.)>.98) {
-                            r=0.;
-                            g=0.;
+                            r=0.6;
+                            g=0.6;
                         }
                     }
                     if (phase == 4) // sine
                     {
-                        if (abs(qx-f)<.03) {
-                            b=i/6.;
-                            g=i/4.;
+                        if (abs(qx-f)<.02*thick) {
+                            r = 0.5-.5*sin(2.*PI*i/4.);
+                            g = 0.5-.5*sin(2.*PI*i/4.-2.*PI/3.);
+                            b = 0.5-.5*sin(2.*PI*i/4.+2.*PI/3.);
                         }
                     }
                     if (phase == 2) // line
                     {
                         if (abs(qx - f2) < .03){
-                            b=i/6.;
-                            g=i/4.;
+                            r = 0.5-.5*sin(2.*PI*i/4.);
+                            g = 0.5-.5*sin(2.*PI*i/4.-2.*PI/3.);
+                            b = 0.5-.5*sin(2.*PI*i/4.+2.*PI/3.);
+                        }
+                    }
+
+                    if (phase == 5) // art
+                    {
+                        if (abs(qx - f3) < .03){
+                            r = 0.5-.5*sin(2.*PI*i/4.);
+                            g = 0.5-.5*sin(2.*PI*i/4.-2.*PI/3.);
+                            b = 0.5-.5*sin(2.*PI*i/4.+2.*PI/3.);
                         }
                     }
                 }
                 
-            }
+            }}
         }
 
         color = vec4(r,g,b,1.);
@@ -218,10 +244,15 @@ const uniforms = {
     phase: 2,
     uSampler2: leaves,
     time: 0,
+    cycles: 1,
     theta: 0,
-    a1: 0,
-    c1: 0,
-    n1: 0,
+    a1: 1,
+    c1: 1,
+    n1: 1,
+    a2: 1,
+    c2: 1,
+    n2: 1,
+    v: 1,
     m1: 0,
     b1: 0,
     show_axes: 1,
@@ -259,13 +290,17 @@ app.ticker.add((delta) => {
 document.addEventListener("DOMContentLoaded", function(){
     document.getElementById("instructions").style.maxHeight = "250px";
     document.getElementById("instructions").style.padding = "0em 1em";
-    document.getElementById("slidersPanel").style.maxHeight = "500px";
+    document.getElementById("slidersPanel").style.maxHeight = "800px";
     document.getElementById("slidersPanel").style.padding = "0em 1em";
 });
 
 
 function handleSpeed(value) {
     app.ticker.speed = value;
+}
+
+function handleCycles(value) {
+    quad.shader.uniforms.cycles = value;
 }
 
 
@@ -275,6 +310,10 @@ function handleTime(value) {
     var thetaText = "time = " + rounded;
     document.getElementById("sliderTime").innerHTML = thetaText;
     drawSineFunc();
+}
+
+function drawSineFunc2() {
+
 }
 
 function drawSineFunc() {
@@ -321,6 +360,14 @@ function handleSineMode(value) {
     drawSineFunc();
 }
 
+function handleArtMode(value) {
+    quad.shader.uniforms.phase = 5;
+    document.getElementById("slidersPhase2Line").style.display = "none";
+    document.getElementById("slidersPhase2Sine").style.display = "block";
+
+    drawSineFunc();
+}
+
 function handleASlider(value) {
     quad.shader.uniforms.a1 = value;
 
@@ -338,6 +385,31 @@ function handleCSlider(value) {
 
     drawSineFunc();
 }
+
+function handleASlider2(value) {
+    quad.shader.uniforms.a2 = value;
+
+    drawSineFunc2();
+}
+
+function handleNSlider2(value) {
+    quad.shader.uniforms.n2 = value;
+
+    drawSineFunc2();
+}
+
+function handleCSlider2(value) {
+    quad.shader.uniforms.c2 = value;
+
+    drawSineFunc2();
+}
+
+function handleVSlider(value) {
+    quad.shader.uniforms.v = value;
+
+    drawSineFunc2();
+}
+
 
 function handleMSlider(value) {
     quad.shader.uniforms.m1 = value;
@@ -363,31 +435,48 @@ function handleTSlider(value) {
     quad.shader.uniforms.angle = value;
 }
 
-function handleTrianglePhase(value) {
+function handleTrianglePhase(value) { // 2
     withTime = true;
-    document.getElementById("panel1").style.display = "block";
-    document.getElementById("panel2").style.display = "none";
+    handleSineMode();
+    document.getElementById("panel1").style.display = "none";
+    document.getElementById("panel2").style.display = "block";
+    document.getElementById("panel3").style.display = "none";
     document.getElementById("slidersPhase1").style.display = "block";
     document.getElementById("slidersPhase2").style.display = "block";
+    document.getElementById("slidersPhase2Sine").style.display = "block";
+    document.getElementById("slidersPhase2Sine").classList.remove("half");
+    document.getElementById("slidersPhase3").style.display="none";
     document.getElementById("equation").style.display = "block";
-    document.getElementById("lineModeButtons").style.display = "none";
-    document.getElementById("sine").checked = true;
-    handleSineMode();
 }
 
-function handleCirclePhase(value) {
+function handleArtPhase(value) { // 3
+    withTime = true;
+    handleArtMode();
+    document.getElementById("panel1").style.display = "none";
+    document.getElementById("panel2").style.display = "none";
+    document.getElementById("panel3").style.display = "block";
+    document.getElementById("slidersPhase1").style.display = "block";
+    document.getElementById("slidersPhase2").style.display = "block";
+    document.getElementById("slidersPhase2Sine").style.display = "inline-block";
+    document.getElementById("slidersPhase3").style.display="inline-block";
+    document.getElementById("slidersPhase2Sine").classList.add("half");
+    document.getElementById("equation").style.display = "block";
+}
+
+function handleCirclePhase(value) { // 1
     if (withTime)
     {
         withTime = false;
-        handleSineMode();
+        handleLineMode();
     }
-
-    document.getElementById("panel1").style.display = "none";
-    document.getElementById("panel2").style.display = "block";
+    document.getElementById("panel1").style.display = "block";
+    document.getElementById("panel2").style.display = "none";
+    document.getElementById("panel3").style.display = "none";
     document.getElementById("slidersPhase1").style.display = "none";
     document.getElementById("slidersPhase2").style.display = "block";
+    document.getElementById("slidersPhase2Sine").classList.remove("half");
+    document.getElementById("slidersPhase3").style.display="none";
     document.getElementById("equation").style.display = "block";
-    document.getElementById("lineModeButtons").style.display = "inline-block";
 }
 
 function handleAxes(value) {
@@ -407,7 +496,7 @@ function handleControls(value)
         document.getElementById("instructions").style.padding = "0em 1em";
         document.getElementById("instructions").style.maxHeight = "250px";
         document.getElementById("slidersPanel").style.padding = "0em 1em";
-        document.getElementById("slidersPanel").style.maxHeight = "500px";
+        document.getElementById("slidersPanel").style.maxHeight = "800px";
     } 
     else
     {
