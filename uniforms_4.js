@@ -141,7 +141,7 @@ const lineFragmentSrc = `
                 
                 float by = qy-2.*PI*i+6.*PI;
                 float f = c1/4.-a1/4.*sin(by*n1+time+cycles);
-                float f2 = m1/4. * by + b1/4.;
+                float f2 = m1/4. * (by) *0. + b1/4.;
                 if (abs(qy)<PI && abs(qx-1.)<1.) {
                     if (show_axes==1 && i==0.)
                     {
@@ -153,15 +153,17 @@ const lineFragmentSrc = `
                     if (phase == 4) // sine
                     {
                         if (abs(qx-f)<.03) {
-                            b=i/6.;
-                            g=i/4.;
+                            r = 0.5-.5*sin(2.*PI*i/4.);
+                            g = 0.5-.5*sin(2.*PI*i/4.-2.*PI/3.);
+                            b = 0.5-.5*sin(2.*PI*i/4.+2.*PI/3.);
                         }
                     }
                     if (phase == 2) // line
                     {
                         if (abs(qx - f2) < .03){
-                            b=i/6.;
-                            g=i/4.;
+                            r = 0.5-.5*sin(2.*PI*i/4.);
+                            g = 0.5-.5*sin(2.*PI*i/4.-2.*PI/3.);
+                            b = 0.5-.5*sin(2.*PI*i/4.+2.*PI/3.);
                         }
                     }
                 }
@@ -177,13 +179,20 @@ const lineFragmentSrc = `
             qx = sqrt(ay*ay+(ax+slide-h)*(ax+slide-h))+h-slide;
             qy = atan(ay,ax+slide-h)*slide;
 
+            if (phase==5) {
+                color = vec4(0.50,1.00,0.83,1.);
+            }
+
             for (float i=0.; i<4.; i+=1.) {
                 if (i<cycles) {
                 float by = qy-2.*PI*i+6.*PI;
+                if (phase == 2){
+                    by = qy+2.*PI*i+6.*PI;
+                }
                 float f = c1/4.-a1/4.*sin(by*n1 - 0.2*time);
                 float dfdx  = -1.*n1*a1/4.*cos(by*n1 - 0.2*time);
                 float thick = sqrt(dfdx*dfdx+1.);
-                float f2 = m1/4. * by + b1/4.;
+                float f2 = m1/4. * (by-5.*PI) + b1/4.;
                 if (abs(qy)<PI && qx>0.) {
                     if (show_axes==1 && i==0.)
                     {
@@ -203,8 +212,9 @@ const lineFragmentSrc = `
                     if (phase == 2) // line
                     {
                         if (abs(qx - f2) < .03){
-                            b=i/6.;
-                            g=i/4.;
+                            r = 0.5-.5*sin(2.*PI*i/4.);
+                            g = 0.5-.5*sin(2.*PI*i/4.-2.*PI/3.);
+                            b = 0.5-.5*sin(2.*PI*i/4.+2.*PI/3.);
                         }
                     }
                 }
@@ -325,9 +335,17 @@ function handleLineMode(value) {
 }
 
 function handleSineMode(value) {
-    quad.shader.uniforms.phase = 4;
-    document.getElementById("slidersPhase2Line").style.display = "none";
-    document.getElementById("slidersPhase2Sine").style.display = "block";
+    quad.shader.uniforms.phase = 2;
+    document.getElementById("slidersPhase2Line").style.display = "block";
+    document.getElementById("slidersPhase2Sine").style.display = "none";
+
+    drawSineFunc();
+}
+
+function handleArtMode(value) {
+    quad.shader.uniforms.phase = 5;
+    document.getElementById("slidersPhase2Line").style.display = "block";
+    document.getElementById("slidersPhase2Sine").style.display = "none";
 
     drawSineFunc();
 }
@@ -384,6 +402,18 @@ function handleTrianglePhase(value) {
     document.getElementById("lineModeButtons").style.display = "none";
     document.getElementById("sine").checked = true;
     handleSineMode();
+}
+
+function handleArtPhase(value) {
+    withTime = true;
+    document.getElementById("panel1").style.display = "block";
+    document.getElementById("panel2").style.display = "none";
+    document.getElementById("slidersPhase1").style.display = "block";
+    document.getElementById("slidersPhase2").style.display = "block";
+    document.getElementById("equation").style.display = "block";
+    document.getElementById("lineModeButtons").style.display = "block";
+    document.getElementById("sine").checked = true;
+    handleArtMode();
 }
 
 function handleCirclePhase(value) {
