@@ -180,7 +180,9 @@ const lineFragmentSrc = `
             qy = atan(ay,ax+slide-h)*slide;
 
             if (phase==5) {
-                color = vec4(0.50,1.00,0.83,1.);
+                r = 0.5;
+                g = 1.0;
+                b = 0.83;
             }
 
             for (float i=0.; i<4.; i+=1.) {
@@ -239,6 +241,10 @@ const uniforms = {
     a1: 1,
     c1: 1,
     n1: 1,
+    a2: 1,
+    c2: 1,
+    n2: 1,
+    v: 1,
     m1: 0,
     b1: 0,
     show_axes: 1,
@@ -276,7 +282,7 @@ app.ticker.add((delta) => {
 document.addEventListener("DOMContentLoaded", function(){
     document.getElementById("instructions").style.maxHeight = "250px";
     document.getElementById("instructions").style.padding = "0em 1em";
-    document.getElementById("slidersPanel").style.maxHeight = "500px";
+    document.getElementById("slidersPanel").style.maxHeight = "800px";
     document.getElementById("slidersPanel").style.padding = "0em 1em";
 });
 
@@ -296,6 +302,10 @@ function handleTime(value) {
     var thetaText = "time = " + rounded;
     document.getElementById("sliderTime").innerHTML = thetaText;
     drawSineFunc();
+}
+
+function drawSineFunc2() {
+
 }
 
 function drawSineFunc() {
@@ -335,17 +345,17 @@ function handleLineMode(value) {
 }
 
 function handleSineMode(value) {
-    quad.shader.uniforms.phase = 2;
-    document.getElementById("slidersPhase2Line").style.display = "block";
-    document.getElementById("slidersPhase2Sine").style.display = "none";
+    quad.shader.uniforms.phase = 4;
+    document.getElementById("slidersPhase2Line").style.display = "none";
+    document.getElementById("slidersPhase2Sine").style.display = "block";
 
     drawSineFunc();
 }
 
 function handleArtMode(value) {
     quad.shader.uniforms.phase = 5;
-    document.getElementById("slidersPhase2Line").style.display = "block";
-    document.getElementById("slidersPhase2Sine").style.display = "none";
+    document.getElementById("slidersPhase2Line").style.display = "none";
+    document.getElementById("slidersPhase2Sine").style.display = "block";
 
     drawSineFunc();
 }
@@ -367,6 +377,31 @@ function handleCSlider(value) {
 
     drawSineFunc();
 }
+
+function handleASlider2(value) {
+    quad.shader.uniforms.a2 = value;
+
+    drawSineFunc2();
+}
+
+function handleNSlider2(value) {
+    quad.shader.uniforms.n2 = value;
+
+    drawSineFunc2();
+}
+
+function handleCSlider2(value) {
+    quad.shader.uniforms.c2 = value;
+
+    drawSineFunc2();
+}
+
+function handleVSlider(value) {
+    quad.shader.uniforms.v = value;
+
+    drawSineFunc2();
+}
+
 
 function handleMSlider(value) {
     quad.shader.uniforms.m1 = value;
@@ -392,43 +427,42 @@ function handleTSlider(value) {
     quad.shader.uniforms.angle = value;
 }
 
-function handleTrianglePhase(value) {
+function handleTrianglePhase(value) { // 2
     withTime = true;
-    document.getElementById("panel1").style.display = "block";
-    document.getElementById("panel2").style.display = "none";
-    document.getElementById("slidersPhase1").style.display = "block";
-    document.getElementById("slidersPhase2").style.display = "block";
-    document.getElementById("equation").style.display = "block";
-    document.getElementById("lineModeButtons").style.display = "none";
-    document.getElementById("sine").checked = true;
     handleSineMode();
-}
-
-function handleArtPhase(value) {
-    withTime = true;
     document.getElementById("panel1").style.display = "block";
     document.getElementById("panel2").style.display = "none";
     document.getElementById("slidersPhase1").style.display = "block";
     document.getElementById("slidersPhase2").style.display = "block";
+    document.getElementById("slidersPhase2Sine").style.display = "block";
+    document.getElementById("slidersPhase3").style.display="none";
     document.getElementById("equation").style.display = "block";
-    document.getElementById("lineModeButtons").style.display = "block";
-    document.getElementById("sine").checked = true;
-    handleArtMode();
 }
 
-function handleCirclePhase(value) {
+function handleArtPhase(value) { // 3
+    withTime = true;
+    handleArtMode();
+    document.getElementById("panel1").style.display = "block";
+    document.getElementById("panel2").style.display = "none";
+    document.getElementById("slidersPhase1").style.display = "block";
+    document.getElementById("slidersPhase2").style.display = "block";
+    document.getElementById("slidersPhase2Sine").style.display = "inline-block";
+    document.getElementById("slidersPhase3").style.display="inline-block";
+    document.getElementById("equation").style.display = "block";
+}
+
+function handleCirclePhase(value) { // 1
     if (withTime)
     {
         withTime = false;
-        handleSineMode();
+        handleLineMode();
     }
-
     document.getElementById("panel1").style.display = "none";
     document.getElementById("panel2").style.display = "block";
     document.getElementById("slidersPhase1").style.display = "none";
     document.getElementById("slidersPhase2").style.display = "block";
+    document.getElementById("slidersPhase3").style.display="none";
     document.getElementById("equation").style.display = "block";
-    document.getElementById("lineModeButtons").style.display = "inline-block";
 }
 
 function handleAxes(value) {
@@ -448,7 +482,7 @@ function handleControls(value)
         document.getElementById("instructions").style.padding = "0em 1em";
         document.getElementById("instructions").style.maxHeight = "250px";
         document.getElementById("slidersPanel").style.padding = "0em 1em";
-        document.getElementById("slidersPanel").style.maxHeight = "500px";
+        document.getElementById("slidersPanel").style.maxHeight = "800px";
     } 
     else
     {
