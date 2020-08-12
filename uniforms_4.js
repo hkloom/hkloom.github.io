@@ -95,6 +95,7 @@ const lineFragmentSrc = `
 
     uniform sampler2D uSampler2;
     uniform float time;
+    uniform float cycles;
     uniform float theta;
     uniform float m1;
     uniform float b1;
@@ -129,15 +130,17 @@ const lineFragmentSrc = `
             float ay = qx;
             float ax = -qy;
 
-            float slide = exp(th);
+            float slide = exp(th*th/5.);
             float h = 1.;
             qx = sqrt(ay*ay+(ax+slide-h)*(ax+slide-h))+h-slide;
             qy = atan(ay,ax+slide-h)*slide;
 
+            const float lim = 4.;
+
             for (float i=0.; i<4.; i+=1.) {
                 
                 float by = qy-2.*PI*i+6.*PI;
-                float f = c1/4.-a1/4.*sin(by*n1);
+                float f = c1/4.-a1/4.*sin(by*n1+time+cycles);
                 float f2 = m1/4. * by + b1/4.;
                 if (abs(qy)<PI && abs(qx-1.)<1.) {
                     if (show_axes==1 && i==0.)
@@ -169,29 +172,32 @@ const lineFragmentSrc = `
             float ay = qx;
             float ax = -qy;
 
-            float slide = exp(th);
+            float slide = exp(th*th/5.);
             float h = 1.;
             qx = sqrt(ay*ay+(ax+slide-h)*(ax+slide-h))+h-slide;
             qy = atan(ay,ax+slide-h)*slide;
 
             for (float i=0.; i<4.; i+=1.) {
-                
+                if (i<cycles) {
                 float by = qy-2.*PI*i+6.*PI;
-                float f = c1/4.-a1/4.*sin(by*n1 + 0.2*time);
+                float f = c1/4.-a1/4.*sin(by*n1 - 0.2*time);
+                float dfdx  = -1.*n1*a1/4.*cos(by*n1 - 0.2*time);
+                float thick = sqrt(dfdx*dfdx+1.);
                 float f2 = m1/4. * by + b1/4.;
-                if (abs(qy)<PI && abs(qx-1.)<1.) {
+                if (abs(qy)<PI && qx>0.) {
                     if (show_axes==1 && i==0.)
                     {
                         if (-cos(16.*qy+PI)>.98 || cos(4.*2.*PI*qx/1.)>.98) {
-                            r=0.;
-                            g=0.;
+                            r=0.6;
+                            g=0.6;
                         }
                     }
                     if (phase == 4) // sine
                     {
-                        if (abs(qx-f)<.03) {
-                            b=i/6.;
-                            g=i/4.;
+                        if (abs(qx-f)<.02*thick) {
+                            r = 0.5-.5*sin(2.*PI*i/4.);
+                            g = 0.5-.5*sin(2.*PI*i/4.-2.*PI/3.);
+                            b = 0.5-.5*sin(2.*PI*i/4.+2.*PI/3.);
                         }
                     }
                     if (phase == 2) // line
@@ -203,7 +209,7 @@ const lineFragmentSrc = `
                     }
                 }
                 
-            }
+            }}
         }
 
         color = vec4(r,g,b,1.);
@@ -218,10 +224,11 @@ const uniforms = {
     phase: 2,
     uSampler2: leaves,
     time: 0,
+    cycles: 1,
     theta: 0,
-    a1: 0,
-    c1: 0,
-    n1: 0,
+    a1: 1,
+    c1: 1,
+    n1: 1,
     m1: 0,
     b1: 0,
     show_axes: 1,
@@ -266,6 +273,10 @@ document.addEventListener("DOMContentLoaded", function(){
 
 function handleSpeed(value) {
     app.ticker.speed = value;
+}
+
+function handleCycles(value) {
+    quad.shader.uniforms.cycles = value;
 }
 
 
