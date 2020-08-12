@@ -440,6 +440,7 @@ function handleTrianglePhase(value) { // 2
     handleSineMode();
     document.getElementById("panel1").style.display = "none";
     document.getElementById("panel2").style.display = "block";
+    document.getElementById("panel3").style.display = "none";
     document.getElementById("slidersPhase1").style.display = "block";
     document.getElementById("slidersPhase2").style.display = "block";
     document.getElementById("slidersPhase2Sine").style.display = "block";
@@ -451,8 +452,9 @@ function handleTrianglePhase(value) { // 2
 function handleArtPhase(value) { // 3
     withTime = true;
     handleArtMode();
-    document.getElementById("panel1").style.display = "block";
+    document.getElementById("panel1").style.display = "none";
     document.getElementById("panel2").style.display = "none";
+    document.getElementById("panel3").style.display = "block";
     document.getElementById("slidersPhase1").style.display = "block";
     document.getElementById("slidersPhase2").style.display = "block";
     document.getElementById("slidersPhase2Sine").style.display = "inline-block";
@@ -469,6 +471,7 @@ function handleCirclePhase(value) { // 1
     }
     document.getElementById("panel1").style.display = "block";
     document.getElementById("panel2").style.display = "none";
+    document.getElementById("panel3").style.display = "none";
     document.getElementById("slidersPhase1").style.display = "none";
     document.getElementById("slidersPhase2").style.display = "block";
     document.getElementById("slidersPhase2Sine").classList.remove("half");
