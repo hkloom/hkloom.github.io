@@ -435,6 +435,7 @@ function handleTrianglePhase(value) { // 2
     document.getElementById("slidersPhase1").style.display = "block";
     document.getElementById("slidersPhase2").style.display = "block";
     document.getElementById("slidersPhase2Sine").style.display = "block";
+    document.getElementById("slidersPhase2Sine").classList.remove("half");
     document.getElementById("slidersPhase3").style.display="none";
     document.getElementById("equation").style.display = "block";
 }
@@ -448,6 +449,7 @@ function handleArtPhase(value) { // 3
     document.getElementById("slidersPhase2").style.display = "block";
     document.getElementById("slidersPhase2Sine").style.display = "inline-block";
     document.getElementById("slidersPhase3").style.display="inline-block";
+    document.getElementById("slidersPhase2Sine").classList.add("half");
     document.getElementById("equation").style.display = "block";
 }
 
@@ -461,6 +463,7 @@ function handleCirclePhase(value) { // 1
     document.getElementById("panel2").style.display = "block";
     document.getElementById("slidersPhase1").style.display = "none";
     document.getElementById("slidersPhase2").style.display = "block";
+    document.getElementById("slidersPhase2Sine").classList.remove("half");
     document.getElementById("slidersPhase3").style.display="none";
     document.getElementById("equation").style.display = "block";
 }

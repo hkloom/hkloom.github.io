@@ -180,3 +180,7 @@ canvas {
   font-weight: bold;
   padding: 5px;
 }
+
+.half {
+  width: 50%;
+}
