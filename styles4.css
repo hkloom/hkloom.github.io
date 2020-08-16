@@ -3,7 +3,8 @@
 }
 
 .equation {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: bold;
 }
 
 .row::after {
@@ -67,7 +68,7 @@ canvas {
     -webkit-transition: .2s;
     transition: opacity .2s;
   }
-  
+
   .slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
@@ -87,8 +88,7 @@ canvas {
   }
 
   #instructions {
-      padding: 1em;
-      padding-top: 0.3em;
+      padding: 0em 1em;
       margin: auto;
       font-family: 'Architect',sans-serif;
       font-size: 2em;
@@ -99,9 +99,10 @@ canvas {
     padding: 0.1em;
     margin: auto;
     font-family: 'Architect',sans-serif;
-    font-size: 3em;
+    font-size: 2.2em;
     background-color: rgb(135, 209, 231);
     border-radius: 0px 0px 8px 8px;
+    text-align: center;
 }
 
 /* For desktop: */
@@ -140,11 +141,31 @@ canvas {
   border-radius: 8px;
 }
 
+.instructionsPanel
+{
+  max-height: 0px;
+  overflow: hidden;
+  transition: max-height 0.4s ease-out;
+}
+
 .sliders
 {
   position: absolute;
-  bottom: 50px;
-  width: 450px;
+  bottom: 10px;
+  max-width: 500px;
+
+  padding: 0em;
+  padding-top: 0.3em;
+  margin: auto;
+  font-family: 'Architect',sans-serif;
+  font-size: 2em;
+
+  max-height: 0px;
+  overflow: hidden;
+  transition: max-height 0.4s ease-out;
+
+  background-color: rgba(255, 255, 255, 0.863);
+  border-radius: 5px;
 }
 
 .sidebside
@@ -158,4 +179,8 @@ canvas {
 {
   font-weight: bold;
   padding: 5px;
+}
+
+.half {
+  width: 50%;
 }
